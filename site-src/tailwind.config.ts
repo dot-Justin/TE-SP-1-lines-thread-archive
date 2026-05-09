@@ -6,16 +6,16 @@ export default {
     extend: {
       colors: {
         te: {
-          black:    '#111111',
-          surface:  '#1c1c1a',
-          surface2: '#242422',
-          light:    '#e8e4df',
-          orange:   '#e84b13',
-          text:     '#f0ede8',
-          muted:    '#888880',
-          border:   '#2a2a28',
+          black:    '#131210',  // warm near-black (from SVG #242423 shifted darker)
+          surface:  '#1e1b18',  // warm dark surface
+          surface2: '#272320',  // warm milestone card bg
+          light:    '#ece5d8',  // warm light
+          orange:   '#fd4816',  // exact SVG orange
+          text:     '#fef7e9',  // SVG cream — the main text color
+          muted:    '#8a8278',  // warm muted (toward SVG #9b939b)
+          border:   '#2e2a24',  // warm border
           green:    '#8ff0a4',
-          dark:     '#1a1a18',
+          dark:     '#1a1714',  // warm dark
         },
       },
       fontFamily: {

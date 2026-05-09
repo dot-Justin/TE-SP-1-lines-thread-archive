@@ -7,9 +7,10 @@ import type { Post } from '../types'
 interface MilestoneCardProps {
   post: Post
   urlMap: Record<string, string>
+  isMatch?: boolean
 }
 
-export function MilestoneCard({ post, urlMap }: MilestoneCardProps) {
+export function MilestoneCard({ post, urlMap, isMatch }: MilestoneCardProps) {
   const milestone = getMilestone(post.num)
   if (!milestone) return null
 
@@ -17,12 +18,14 @@ export function MilestoneCard({ post, urlMap }: MilestoneCardProps) {
 
   return (
     <motion.div
-      id={`post-${post.num}`}
+      id={String(post.num)}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-80px' }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="relative bg-te-surface2 border-y border-te-orange/30 overflow-hidden"
+      className={`relative bg-te-surface2 border-y border-te-orange/30 overflow-hidden ${
+        isMatch ? 'border-l-2 border-l-te-orange' : ''
+      }`}
       style={{ margin: '0 calc(-1 * var(--thread-gutter, 0px))' }}
     >
       {/* Ghost post number watermark */}

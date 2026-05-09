@@ -6,16 +6,19 @@ import type { Post } from '../types'
 interface VirtualizerInfo {
   scrollMargin: number
   getTotalSize: () => number
+  scrollToIndex: (index: number) => void
 }
 
 interface PostListProps {
   posts: Post[]
   urlMap: Record<string, string>
   isEmpty: boolean
+  matchPostNums?: Set<number>
   onVirtualizerReady?: (info: VirtualizerInfo) => void
+  onCurrentIndexChange?: (index: number) => void
 }
 
-export function PostList({ posts, urlMap, isEmpty, onVirtualizerReady }: PostListProps) {
+export function PostList({ posts, urlMap, isEmpty, matchPostNums, onVirtualizerReady, onCurrentIndexChange }: PostListProps) {
   const listRef = useRef<HTMLDivElement>(null)
   const [scrollMargin, setScrollMargin] = useState(0)
 
@@ -39,9 +42,29 @@ export function PostList({ posts, urlMap, isEmpty, onVirtualizerReady }: PostLis
       onVirtualizerReady({
         scrollMargin,
         getTotalSize: () => virtualizer.getTotalSize(),
+        scrollToIndex: (index: number) => virtualizer.scrollToIndex(index, { align: 'start' }),
       })
     }
   }, [scrollMargin, onVirtualizerReady, virtualizer])
+
+  // Track topmost visible item using actual rendered positions
+  useEffect(() => {
+    if (!onCurrentIndexChange || scrollMargin === 0) return
+    const onScroll = () => {
+      const viewTop = window.scrollY - scrollMargin
+      const rendered = virtualizer.getVirtualItems()
+      // Find the last item whose start is at or above the current scroll position
+      let best = rendered[0]
+      for (const item of rendered) {
+        if (item.start <= viewTop + 1) best = item
+        else break
+      }
+      if (best) onCurrentIndexChange(best.index)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [scrollMargin, onCurrentIndexChange, virtualizer])
 
   const items = virtualizer.getVirtualItems()
 
@@ -85,7 +108,7 @@ export function PostList({ posts, urlMap, isEmpty, onVirtualizerReady }: PostLis
                 transform: `translateY(${item.start - virtualizer.options.scrollMargin}px)`,
               }}
             >
-              <PostCard post={post} urlMap={urlMap} />
+              <PostCard post={post} urlMap={urlMap} isMatch={matchPostNums?.has(post.num) ?? false} />
             </div>
           )
         })}

@@ -1,13 +1,12 @@
 import { useState, useEffect, useMemo } from 'react'
-import type { Post, TopicFilter } from '../types'
+import type { Post } from '../types'
 
 const DEBOUNCE_MS = 200
 
 export function useSearch(posts: Post[]) {
   const [query, setQuery] = useState('')
   const [debouncedQuery, setDebouncedQuery] = useState('')
-  const [topicFilter, setTopicFilter] = useState<TopicFilter>('all')
-  const [topicPostNums, setTopicPostNums] = useState<Set<number> | null>(null)
+  const [currentMatchIdx, setCurrentMatchIdx] = useState(0)
 
   // Debounce search query
   useEffect(() => {
@@ -15,48 +14,48 @@ export function useSearch(posts: Post[]) {
     return () => clearTimeout(t)
   }, [query])
 
-  // Load topic index when a specific topic is selected
+  // Reset focused match index when query changes
   useEffect(() => {
-    if (topicFilter === 'all') {
-      setTopicPostNums(null)
-      return
-    }
-    // topic-index.json is in docs/indexes/ alongside post-index.json
-    fetch('/indexes/topic-index.json')
-      .then(r => r.json())
-      .then((data: Record<string, number[]>) => {
-        const nums = data[topicFilter]
-        setTopicPostNums(nums ? new Set(nums) : null)
-      })
-      .catch(() => setTopicPostNums(null))
-  }, [topicFilter])
+    setCurrentMatchIdx(0)
+  }, [debouncedQuery])
 
-  const filtered = useMemo(() => {
-    let result = posts
-
-    // Topic filter
-    if (topicFilter !== 'all' && topicPostNums !== null) {
-      result = result.filter(p => topicPostNums.has(p.num))
-    }
-
-    // Text search on author and stripped post body
+  // Compute indices of matching posts
+  const matchIndices = useMemo(() => {
     const q = debouncedQuery.trim().toLowerCase()
-    if (q) {
-      result = result.filter(p =>
+    if (!q) return []
+    return posts.reduce((acc, p, i) => {
+      if (
         p.author.toLowerCase().includes(q) ||
-        // Strip HTML tags for text search
         p.cooked.replace(/<[^>]+>/g, ' ').toLowerCase().includes(q)
-      )
-    }
+      ) {
+        acc.push(i)
+      }
+      return acc
+    }, [] as number[])
+  }, [posts, debouncedQuery])
 
-    return result
-  }, [posts, debouncedQuery, topicFilter, topicPostNums])
+  // Set of matching post.num values for O(1) per-card lookup
+  const matchPostNums = useMemo(
+    () => new Set(matchIndices.map(i => posts[i]?.num).filter(Boolean)),
+    [matchIndices, posts]
+  )
+
+  const goNext = () =>
+    setCurrentMatchIdx(i => (i + 1) % Math.max(1, matchIndices.length))
+
+  const goPrev = () =>
+    setCurrentMatchIdx(i =>
+      (i - 1 + matchIndices.length) % Math.max(1, matchIndices.length)
+    )
 
   return {
     query,
     setQuery,
-    topicFilter,
-    setTopicFilter,
-    filtered,
+    matchIndices,
+    matchPostNums,
+    currentMatchIdx,
+    goNext,
+    goPrev,
+    totalMatches: matchIndices.length,
   }
 }

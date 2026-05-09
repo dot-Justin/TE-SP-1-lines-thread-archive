@@ -28,7 +28,7 @@ export function useHashSync(
 
       if (debounceTimer.current) clearTimeout(debounceTimer.current)
       debounceTimer.current = setTimeout(() => {
-        const newHash = `#post-${post.num}`
+        const newHash = `#${post.num}`
         if (window.location.hash !== newHash) {
           history.replaceState(null, '', newHash)
         }
@@ -46,7 +46,7 @@ export function useHashSync(
   useEffect(() => {
     if (!virtualizerInfo || posts.length === 0) return
     const hash = window.location.hash
-    const match = hash.match(/^#post-(\d+)$/)
+    const match = hash.match(/^#(\d+)$/)
     if (!match) return
 
     const targetNum = Number(match[1])

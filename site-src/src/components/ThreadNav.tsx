@@ -1,32 +1,22 @@
 import { useEffect, useState, useRef } from 'react'
-import { MagnifyingGlass, X } from '@phosphor-icons/react'
-import type { TopicFilter } from '../types'
-
-const TOPICS: { id: TopicFilter; label: string }[] = [
-  { id: 'all',                label: 'ALL' },
-  { id: 'hardware',           label: 'HARDWARE' },
-  { id: 'audio',              label: 'AUDIO' },
-  { id: 'firmware',           label: 'FIRMWARE' },
-  { id: 'bootloader',         label: 'BOOTLOADER' },
-  { id: 'reverse_engineering',label: 'RE' },
-]
+import { MagnifyingGlass, X, ArrowUp, ArrowDown } from '@phosphor-icons/react'
 
 interface ThreadNavProps {
   query: string
   setQuery: (q: string) => void
-  topicFilter: TopicFilter
-  setTopicFilter: (t: TopicFilter) => void
-  filteredCount: number
-  totalCount: number
+  totalMatches: number
+  currentMatchIdx: number
+  goNext: () => void
+  goPrev: () => void
 }
 
 export function ThreadNav({
   query,
   setQuery,
-  topicFilter,
-  setTopicFilter,
-  filteredCount,
-  totalCount,
+  totalMatches,
+  currentMatchIdx,
+  goNext,
+  goPrev,
 }: ThreadNavProps) {
   const [visible, setVisible] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -42,6 +32,8 @@ export function ThreadNav({
     return () => observer.disconnect()
   }, [])
 
+  const hasQuery = query.trim().length > 0
+
   return (
     <div
       className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ${
@@ -50,11 +42,10 @@ export function ThreadNav({
     >
       <div className="bg-te-black/95 backdrop-blur-md border-b border-te-border">
         <div className="max-w-5xl mx-auto px-4 md:px-8">
-          {/* Top row */}
-          <div className="flex items-center gap-4 py-3">
+          <div className="flex items-center gap-3 py-3">
             {/* Title */}
             <span className="font-display font-black text-te-text text-xl md:text-2xl tracking-tight uppercase leading-none flex-shrink-0">
-              STEM PLAYER
+              SP-1
             </span>
 
             {/* Search */}
@@ -82,30 +73,35 @@ export function ThreadNav({
               )}
             </div>
 
-            {/* Count */}
-            <span className="font-mono text-[0.6rem] text-te-muted tracking-wider flex-shrink-0 hidden md:block">
-              {filteredCount}/{totalCount}
-            </span>
-          </div>
+            {/* Match navigation — shown when query is active */}
+            {hasQuery && totalMatches > 0 && (
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <button
+                  onClick={goPrev}
+                  className="text-te-muted hover:text-te-orange transition-colors p-1"
+                  aria-label="Previous match"
+                >
+                  <ArrowUp size={12} />
+                </button>
+                <span className="font-mono text-[0.55rem] text-te-muted tracking-wide whitespace-nowrap">
+                  {currentMatchIdx + 1}/{totalMatches}
+                </span>
+                <button
+                  onClick={goNext}
+                  className="text-te-muted hover:text-te-orange transition-colors p-1"
+                  aria-label="Next match"
+                >
+                  <ArrowDown size={12} />
+                </button>
+              </div>
+            )}
 
-          {/* Topic filters */}
-          <div className="flex items-center gap-2 pb-2 overflow-x-auto scrollbar-none">
-            <span className="font-mono text-[0.5rem] text-te-muted tracking-[0.2em] uppercase flex-shrink-0 hidden sm:block">
-              FILTER
-            </span>
-            {TOPICS.map(({ id, label }) => (
-              <button
-                key={id}
-                onClick={() => setTopicFilter(id)}
-                className={`flex-shrink-0 font-mono text-[0.6rem] tracking-[0.15em] px-3 py-1.5 rounded transition-all duration-150 ${
-                  topicFilter === id
-                    ? 'bg-te-orange text-te-black'
-                    : 'text-te-muted hover:text-te-text border border-te-border hover:border-te-muted'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+            {/* No results indicator */}
+            {hasQuery && totalMatches === 0 && (
+              <span className="font-mono text-[0.55rem] text-te-muted tracking-wide flex-shrink-0">
+                no matches
+              </span>
+            )}
           </div>
         </div>
       </div>

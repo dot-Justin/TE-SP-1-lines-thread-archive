@@ -8,11 +8,12 @@ import type { Post } from '../types'
 interface PostCardProps {
   post: Post
   urlMap: Record<string, string>
+  isMatch?: boolean
 }
 
-export const PostCard = memo(function PostCard({ post, urlMap }: PostCardProps) {
+export const PostCard = memo(function PostCard({ post, urlMap, isMatch }: PostCardProps) {
   if (isMilestone(post.num)) {
-    return <MilestoneCard post={post} urlMap={urlMap} />
+    return <MilestoneCard post={post} urlMap={urlMap} isMatch={isMatch} />
   }
 
   const numStr = String(post.num).padStart(4, '0')
@@ -20,8 +21,10 @@ export const PostCard = memo(function PostCard({ post, urlMap }: PostCardProps) 
 
   return (
     <article
-      id={`post-${post.num}`}
-      className="group border-b border-te-border bg-te-black hover:bg-te-surface/40 transition-colors duration-200"
+      id={String(post.num)}
+      className={`group border-b border-te-border bg-te-black hover:bg-te-surface/40 transition-colors duration-200 ${
+        isMatch ? 'border-l-2 border-l-te-orange' : ''
+      }`}
     >
       <div className="max-w-5xl mx-auto px-4 md:px-8 py-6">
         {/* Post header */}

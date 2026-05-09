@@ -1,7 +1,7 @@
 // Rewrites llllllll.co upload URLs to local asset paths using the url-map
 // Falls back to original URL if no local mapping exists
 
-const UPLOAD_RE = /https:\/\/llllllll\.co\/uploads\/default\/[^\s"')>]*/g
+const UPLOAD_RE = /https:\/\/llllllll\.co\/uploads\/(default|short-url)\/[^\s"')>]*/g
 
 export function rewriteCooked(html: string, urlMap: Record<string, string>): string {
   if (!html || Object.keys(urlMap).length === 0) return html
@@ -27,23 +27,29 @@ export function rewriteCooked(html: string, urlMap: Record<string, string>): str
 
 // Strips lightbox wrappers from Discourse-generated HTML and fixes relative links
 export function cleanDiscourseHtml(html: string): string {
-  // Remove onebox embeds (Discourse link-preview cards) — the actual <a> links
-  // are already present in the surrounding text, so nothing of value is lost
-  let clean = html.replace(/<aside[^>]*class="[^"]*onebox[^"]*"[\s\S]*?<\/aside>/gi, '')
+  // Use DOMParser to reliably strip onebox embeds — regex fails on nested HTML in browsers
+  const doc = new DOMParser().parseFromString(html, 'text/html')
+
+  // Remove onebox embeds (Discourse link-preview cards) — actual <a> links are in surrounding text
+  doc.querySelectorAll('aside.onebox, aside[data-onebox-src]').forEach(el => el.remove())
 
   // Remove lightbox wrapper anchors but keep the img inside
-  clean = clean.replace(
-    /<a[^>]*class="[^"]*lightbox[^"]*"[^>]*>([\s\S]*?)<\/a>/gi,
-    (_, inner) => inner
-  )
-
-  // Remove the meta/details elements Discourse adds to lightboxes
-  clean = clean.replace(/<div[^>]*class="[^"]*meta[^"]*"[^>]*>[\s\S]*?<\/div>/gi, '')
-  clean = clean.replace(/<[^>]*data-base62-sha1[^>]*>/g, (tag) => {
-    return tag
-      .replace(/\s+data-base62-sha1="[^"]*"/, '')
-      .replace(/\s+data-download-href="[^"]*"/, '')
+  doc.querySelectorAll('a.lightbox').forEach(a => {
+    const frag = document.createDocumentFragment()
+    while (a.firstChild) frag.appendChild(a.firstChild)
+    a.replaceWith(frag)
   })
+
+  // Remove Discourse lightbox meta divs
+  doc.querySelectorAll('div.meta').forEach(el => el.remove())
+
+  // Strip data-base62-sha1 / data-download-href attributes
+  doc.querySelectorAll('[data-base62-sha1]').forEach(el => {
+    el.removeAttribute('data-base62-sha1')
+    el.removeAttribute('data-download-href')
+  })
+
+  let clean = doc.body.innerHTML
 
   // Fix Discourse relative links → absolute llllllll.co URLs
   // Covers @mentions (/u/), topic links (/t/), category links (/c/)

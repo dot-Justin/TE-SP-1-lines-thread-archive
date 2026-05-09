@@ -3,13 +3,9 @@ const ITEMS = [
   '179 PARTICIPANTS',
   '78,451 VIEWS',
   '4,967 LIKES',
-  'FIRMWARE DUMPED JAN 25 2025',
-  'ATTEMPT #8,504',
-  'CUSTOM STEMS: POST 499',
-  'BOOTLOADER CRACKED',
-  'SOLDERLESS.ENGINEERING',
-  'nRF52840 + CS42L42 + TAS2505',
-  '24-BIT 48KHz 8-CHANNEL PCM',
+  'APRIL 2024 — MAY 2026',
+  'FIRMWARE DUMPED FEB 2025',
+  'BOOTLOADER CRACKED MAR 2026',
   'THREAD CLOSED MAY 2026',
 ]
 
@@ -28,7 +24,7 @@ export function StatsTicker() {
             <span className="font-mono text-te-black text-[0.7rem] md:text-xs font-medium tracking-[0.15em] uppercase px-6">
               {item}
             </span>
-            <span className="font-mono text-te-black opacity-40 text-sm">-</span>
+            <span className="font-mono text-te-black opacity-40 text-sm">·</span>
           </span>
         ))}
       </div>

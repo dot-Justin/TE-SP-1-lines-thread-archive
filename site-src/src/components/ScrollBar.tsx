@@ -5,11 +5,13 @@ import { MILESTONES } from '../lib/milestones'
 interface VirtualizerInfo {
   scrollMargin: number
   getTotalSize: () => number
+  scrollToIndex: (index: number) => void
 }
 
 interface ScrollBarProps {
   posts: Post[]
   virtualizerInfo: VirtualizerInfo | null
+  currentIndex: number
 }
 
 function formatDate(iso: string): string {
@@ -17,7 +19,7 @@ function formatDate(iso: string): string {
   return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
 }
 
-export function ScrollBar({ posts, virtualizerInfo }: ScrollBarProps) {
+export function ScrollBar({ posts, virtualizerInfo, currentIndex }: ScrollBarProps) {
   const [visible, setVisible] = useState(false)
   const [fraction, setFraction] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
@@ -49,12 +51,8 @@ export function ScrollBar({ posts, virtualizerInfo }: ScrollBarProps) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [virtualizerInfo])
 
-  // Compute current post from fraction
-  const currentIndex = Math.min(
-    Math.floor(fraction * posts.length),
-    posts.length - 1
-  )
-  const currentPost = posts[Math.max(0, currentIndex)]
+  // Use accurate currentIndex from virtualizer (passed as prop)
+  const currentPost = posts[Math.max(0, Math.min(currentIndex, posts.length - 1))]
 
   // Jump on click/drag
   const jumpToFraction = useCallback((f: number) => {
@@ -92,8 +90,9 @@ export function ScrollBar({ posts, virtualizerInfo }: ScrollBarProps) {
       fraction: idx / Math.max(1, posts.length - 1),
       label: MILESTONES[num].label,
       num,
+      idx,
     }
-  }).filter(Boolean) as { fraction: number; label: string; num: number }[]
+  }).filter(Boolean) as { fraction: number; label: string; num: number; idx: number }[]
 
   if (!visible || posts.length === 0) return null
 
@@ -101,7 +100,7 @@ export function ScrollBar({ posts, virtualizerInfo }: ScrollBarProps) {
 
   return (
     <div
-      className="fixed right-3 md:right-5 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center gap-1.5 select-none"
+      className="hidden md:flex fixed right-3 md:right-5 top-1/2 -translate-y-1/2 z-40 flex-col items-center gap-1.5 select-none"
       style={{ height: '60vh' }}
     >
       {/* Top date */}
@@ -127,11 +126,11 @@ export function ScrollBar({ posts, virtualizerInfo }: ScrollBarProps) {
         {milestoneTicks.map(tick => (
           <div
             key={tick.num}
-            className="absolute left-1/2 -translate-x-1/2 group"
+            className="absolute left-1/2 -translate-x-1/2 group cursor-pointer"
             style={{ top: `${tick.fraction * 100}%` }}
-            title={tick.label}
+            onClick={(e) => { e.stopPropagation(); virtualizerInfo?.scrollToIndex(tick.idx) }}
           >
-            <div className="w-2 h-[2px] bg-te-orange rounded-full -translate-x-[2px]" />
+            <div className="w-2 h-[2px] bg-te-orange rounded-full -translate-x-[2px] group-hover:scale-x-150 transition-transform" />
             {/* Tooltip on hover */}
             <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
               <span className="font-mono text-[0.5rem] text-te-orange tracking-wide bg-te-black border border-te-border px-2 py-1 rounded">
