@@ -1,0 +1,10 @@
+# Post #52
+
+**Author:** Blazeauga  
+**Date:** 2025-01-07T01:33:06.339Z  
+**Post ID:** 734350  
+
+---
+
+<p>We should find a capable software engineer online who would take on the project passionately and then crowd fund him a unit to experiment with. Being able to frontload this with whatever music would be a creative dream. Though I will say that after about two hours of tinkering, I wish the loop function had a little more depth and wasn’t limited to four beats.</p>
+<p>It’s disheartening that none of the manuals for these demos mention anything about data transfer. Makes me wonder if the concept was always “experience a specific album in a new way”. This could’ve expanded to other Kanye albums and maybe other artists. Similar to how TE produces pocket operator variants.</p>

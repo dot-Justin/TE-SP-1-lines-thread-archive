@@ -1,0 +1,13 @@
+# Post #82
+
+**Author:** Galapagoose  
+**Date:** 2025-01-10T20:46:28.306Z  
+**Post ID:** 735133  
+
+---
+
+<p>i got stuck on the jtag header because i dont have a real programmer (just stlink’s which are more locked down and less flexible). setting up a raspi as a jlink but that wont happen for a few days.</p>
+<p>also my thought that the unknown signal on the jtag header was nRESET seems incorrect (or perhaps is reassigned after boot) as shorting it to 3v3 or gnd did not reset the device.</p>
+<p>i looked into the usb side of things but it’s using a custom usb class (likely to include multiple different interfaces) but i dont know how to get more info about how that works. guessing it’s a copy-paste from their other devices so that should help w reversing it, but a little beyond my paygrade.</p>
+<p>i actually applied for a job w them years back and they were looking for ppl with Zephyr RTOS experience, so i’m guessing that’s what’s running on here. not sure if that helps decode the usb setup, but thought i’d mention!</p>
+<p>how are people “turning on” the device to check for bootloader/mass storage button combos? i’m so used to having a dedicated “reset” button that im unsure how to work without one.</p>

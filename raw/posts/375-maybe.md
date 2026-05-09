@@ -1,0 +1,9 @@
+# Post #375
+
+**Author:** maybe  
+**Date:** 2025-05-26T07:58:51.278Z  
+**Post ID:** 753310  
+
+---
+
+<p>I just received both of my devices and noticed a significant difference in quality. One unit has the serial number Y4KNGAKJ. On this unit, the print on the back is more defined, the buttons are noticeably clickier, and the volume sliders have a better tactile feel. The other unit, with serial number Y4KNGAGX, appears to function properly overall, but the play button gets stuck. So I wonder if the GAGX is a later revision with lower qc?</p>

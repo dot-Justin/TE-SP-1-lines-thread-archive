@@ -1,0 +1,11 @@
+# Post #659
+
+**Author:** TimK  
+**Date:** 2026-02-17T11:48:31.106Z  
+**Post ID:** 783452  
+
+---
+
+<p>SP01 has 4GB of internal FLASH memory, but JIK only uses 1.9GB of that, the rest is zeroed out.</p>
+<p>There’s no space in the enclosure to fit anything like this (unless you remove the battery or other stuff) but more importantly, no interface to connect to. I very much doubt it would be possible to add any hardware mods in this enclosure.</p>
+<p>Also the system is too slow to add lots of memory. 2GB transfer is roughly an hour of waiting. It’s pointless to add more memory unless the system is completely redesigned.</p>

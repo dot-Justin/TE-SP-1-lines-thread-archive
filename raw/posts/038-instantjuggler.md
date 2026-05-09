@@ -1,0 +1,11 @@
+# Post #38
+
+**Author:** instantjuggler  
+**Date:** 2024-12-27T09:06:37.887Z  
+**Post ID:** 732825  
+
+---
+
+<p>there was a friends and family release of perhaps around 200 units that had some different printing on the back and came in little boxes with an instruction sheet. a very small number of the friends and family release were sold on reselling platforms. those units got sold over and over again and eventually became pretty beat up. it makes sense that because it was a friends and family only release, not many of those people would let their units get out in the wild, perhaps to stop from not being considered a friend or family in the future. its rumored that one of the first units leaked out behind the scenes came from ye’s pesonal chef who sold his stem player to a fan.</p>
+<p>then there was 200 to 400 dead stock units found in a warehouse in L.A. a couple of years ago. those units only had the usb cable with them, no box, and different text on the back. that’s what’s currently being sold online, mostly through paris saint, and now because paris saint offered them at such a low price, you start to see these units popping up on ebay quite regularly.</p>
+<p>and since its that time of year right now, i should point out that there is a TE guide for the device that hinted at a “christmas edition” of the unit!</p>

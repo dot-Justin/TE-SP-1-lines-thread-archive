@@ -1,0 +1,13 @@
+# Post #419
+
+**Author:** TimK  
+**Date:** 2025-09-30T06:51:41.836Z  
+**Post ID:** 767032  
+
+---
+
+<p>I don’t really understand your question, but I’ll try to answer? I can only speak for myself, I don’t really know what anyone else here is doing.</p>
+<p>To me, the stem player is a very fancy nRF52840 dev board. This is a fun side project that I can put on pause whenever real work / dad life gets too busy. I definitely am not trying to sell anything here and I certainly don’t want to start producing stem players myself. That would require a lot of time and money and a serious team of engineers and designers. Probably a manager and a business plan too.<img src="https://llllllll.co/images/emoji/apple/hot_face.png?v=15" title=":hot_face:" class="emoji" alt=":hot_face:" loading="lazy" width="20" height="20"></p>
+<p>At some point I do want to have a functioning firmware I can share, but I’m only doing this for my own entertainment and don’t want to promise anyone anything. I know it is technically perfectly possible to make the firmware I have in mind, but it’s a lot of work to get it right. I also want to share as much of my findings as possible, but I don’t want to illegally publish anything or upset TE.</p>
+<p>Right now, I don’t see a way yet of making this easy to share. Once there’s a bootloader on the device it would be easy to update the firmware. But initially you will always need to completely open up the device and connect a programmer to the SWD port on the back of the PCB to load a bootloader (and erase TE’s firmware). If anyone has a better idea, I would love to hear it.</p>
+<p>I won’t advise you on buying an object that -right now - can only play songs that I personally can’t wait to get rid of… <img src="https://llllllll.co/images/emoji/apple/smiling_face_with_sunglasses.png?v=15" title=":smiling_face_with_sunglasses:" class="emoji" alt=":smiling_face_with_sunglasses:" loading="lazy" width="20" height="20"></p>

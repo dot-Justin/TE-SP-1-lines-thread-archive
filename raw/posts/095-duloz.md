@@ -1,0 +1,10 @@
+# Post #95
+
+**Author:** Duloz  
+**Date:** 2025-01-11T19:23:17.689Z  
+**Post ID:** 735274  
+
+---
+
+<p>I made  a pipe out of a tic tac box my freshman year of college about 24 years ago. Yeah, I’m old.</p>
+<p>Back to the broader group: I’m weighing buying a dev kit from nordic for the nRF52840 so that I can try to interact with it from the pc side. It’s $50, and I have a gift card of some amount or another coming to me from work for producing a holiday song with industry-specific lyrics with contributions from other employees… but I’m not sure how much of a help it would be. I’ve tried the nRF connect app by nordic on both ios and android, and the app does not see the stem player on either os, despite it being visible in a normal BT scan.</p>

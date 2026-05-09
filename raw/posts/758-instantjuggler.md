@@ -1,0 +1,13 @@
+# Post #758
+
+**Author:** instantjuggler  
+**Date:** 2026-03-11T10:01:04.338Z  
+**Post ID:** 786147  
+
+---
+
+<p>thanks for the summary! really great collection of information there, some real deep cuts that are appreciated.</p>
+<p>i couldn’t find it right now, but i recall that not too long ago, maybe within the past few months, didn’t jesper post a photo (most likely on instagram, maybe as a story) of him at ye’s wyoming ranch along with a handful of other TE members, during the wyoming era?</p>
+<p>i don’t have the timeline in front of me right now of the full wyoming era of the production studios out there on his ranch, but i wonder how that timeline lines up with the first public mention of either the TE or kano player.</p>
+<p>as well, i have always suspected that virgil introduced ye to TE somehow… that could also be a timeline to chase up, to see when virgil first started to hang out with TE to start to triangulate some more details on the timeline. i’m sure if i was better at speaking swedish we could find out when ye was in stockholm, visiting and working with TE along with virgil, it was all over the news in stockholm back when that happened.</p>
+<p>i just wish alex klein would support his claims that TE “stole” the stem player (concept?) from kano with actual facts and dates and evidence. there are several sources of ye talking about making a stem player going back as far as 2013. would be so fun to untangle what the actual truth is…</p>

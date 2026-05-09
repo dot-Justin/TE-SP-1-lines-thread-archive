@@ -1,0 +1,15 @@
+# Post #186
+
+**Author:** Duloz  
+**Date:** 2025-01-23T21:30:58.169Z  
+**Post ID:** 737414  
+
+---
+
+<p>I am continuing to throw stuff at it to see if i can make anything else happen. As i think about it, I’m almost positive it had to be something done via usb, as i’d already broken the button off before i started running stuff, and hadn’t taken it back apart. My process has been to turn it on and start it playing before i run the script to keep it from turning off. it wasn’t until after i quit that i noticed it wasn’t working anymore.</p>
+<p>I could still be wrong, it would not be remotely close to the first time.</p>
+<p>edit: unfortunately, there is nothing obvious in the logs.</p>
+<p>Edit 2: I assume it was one in the 800 block, since those return successes, and no other ones have. I’m going back through the 800 block, trying every single code, it’s going to take a while.<br>
+altogether, i may be wasting a lot of time.</p>
+<p>mispoke when i said 800 block. adhd brain. meant 0x80, but no dice there. I’m going to run through a few more this weekend, but at this point it is just a test device, and while i will brag about my soldering skills to an extent, my limit seems to be adding GPIO pins, no smaller, and specifically through-hole. Either i can keep putzing with this board and use it as a test target for firmware if it is pulled, OR i could drop the broke-ass one in the mail to someone who is trying to work on the the aprotect fault injection so you have an already busted board in case it bricks or whatever.</p>
+<p>I’m going through 0x00-0x0F now, will do 0x40 and 0xc0 as well because those are generally vendor specific, and wireshark and lsusb both say it is in vendr specific mode, so i’m probably an iduot for not starting there.</p>

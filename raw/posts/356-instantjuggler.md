@@ -1,0 +1,9 @@
+# Post #356
+
+**Author:** instantjuggler  
+**Date:** 2025-04-18T17:57:38.255Z  
+**Post ID:** 748806  
+
+---
+
+<p>seems like people have gotten the firmware off the device so far… but i’m not part of any discord groups… not sure if the conversation has moved there or somewhere else or the efforts have stalled out for now (or forever?). not any updates here in this thread for quite some time, no idea if reflashing could be a thing at some point. would hope so!</p>

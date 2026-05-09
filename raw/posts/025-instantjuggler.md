@@ -1,0 +1,19 @@
+# Post #25
+
+**Author:** instantjuggler  
+**Date:** 2024-08-21T20:58:18.164Z  
+**Post ID:** 712777  
+
+---
+
+<p>i made a video document of all the features from the guides collected here in this thread:</p>
+<div class="youtube-onebox lazy-video-container" data-video-id="zynYy35AdE0" data-video-title="Teenage Engineering Stem Player Deep Dive" data-video-start-time="" data-provider-name="youtube">
+  <a href="https://www.youtube.com/watch?v=zynYy35AdE0" target="_blank" class="video-thumbnail" rel="noopener nofollow noreferrer ugc">
+    <img class="youtube-thumbnail" src="https://img.youtube.com/vi/zynYy35AdE0/maxresdefault.jpg" title="Teenage Engineering Stem Player Deep Dive" width="690" height="388">
+  </a>
+</div>
+
+<p>and <a class="mention" href="/u/xmacex">@xmacex</a> in regards to your comments- yeah there’s been a bunch of examples of artists releasing music and letting the audience kind of have the final say in how it sounds in the end. to pick a random one for fun, apparatjik distributed stems online and let anyone remix them, continuing this for several rounds until they themselves did a final remix which was once again released as stems.</p>
+<p>you mention something like a four-track oooooo script with hands-on control and that’s exactly right- this is once again one of those things where the whole is more than the sum of its parts somehow. it doesn’t have all the functionality in the world, but it packs a ton in such a tiny space. the physical controls plus the immediacy of the work flow makes it really compelling to play with. its really hard to communicate just how nice it is to use and how absolutely tiny it is in person.</p>
+<p>and yeah, just letting the album play through is pretty much the exact same thing as listening to the album i’d say. however, because there’s just enough granular control and just enough effects built in, i’d say its pretty easy to generate completely foreign soundscape-esque loops. my plan for now is to make a live set around first building a loop on the stem player and then layering over top of it with other machines. because the album features vocals, and the player has reverse and speed controls, plus some limited loop point features, you can get really weird vocal sounds that don’t exactly sound like vocals. there’s a great feature on the device in that you can set up a framework- your loop length, direction, speed, which stems you want muted, and then unique effects on each stem… and then gently scrub through the song with that framework intact. you get these moments of vocal lines phasing into and out of the loop length. so you can dial in just the start of words, or just the end of a syllable.</p>
+<p>and at the end of the day, some of the drum production on the album isn’t bad. you can just mute out the other layers, set a short loop point, and have some nice drums and put effects over them. and yeah i get it, you could anyway have a little drum loop with a million other devices and by splitting the stems out online from the original album (or probably at this point just find the original stems that have leaked). but for me personally i really like this sandboxed approach to creativity at the moment. its like hey here’s a little box with an album on it, you can’t change that, but here’s a few things you can change. so now go to work on that and build from there. its a fun game for me at the moment at least!!</p>
