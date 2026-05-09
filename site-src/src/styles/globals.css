@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Base page styles */
+body {
+  @apply bg-te-black text-te-text font-body;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hide scrollbar but allow scrolling */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Technical term highlight (set in highlightTerms.ts) */
+.term-highlight {
+  @apply font-mono text-te-orange text-[0.8em] border-b border-te-orange/40 pb-px;
+  font-size: inherit;
+}
+
+/* Post content prose styles */
+.prose-te {
+  @apply font-body text-te-text/90 text-sm md:text-base leading-relaxed;
+}
+
+.prose-te p {
+  @apply mb-4;
+}
+
+.prose-te p:last-child {
+  @apply mb-0;
+}
+
+.prose-te a {
+  @apply text-te-orange underline underline-offset-2 decoration-te-orange/40 hover:decoration-te-orange transition-colors;
+}
+
+.prose-te img {
+  @apply max-w-full rounded border border-te-border my-4;
+  height: auto;
+}
+
+.prose-te code {
+  @apply font-mono text-te-green bg-te-surface px-1.5 py-0.5 rounded text-[0.85em];
+}
+
+.prose-te pre {
+  @apply font-mono bg-te-surface border border-te-border rounded p-4 my-4 overflow-x-auto text-sm;
+}
+
+.prose-te pre code {
+  @apply bg-transparent p-0 text-te-green;
+}
+
+.prose-te blockquote {
+  @apply border-l-2 border-te-orange/40 pl-4 italic text-te-muted my-4;
+}
+
+.prose-te ul {
+  @apply list-disc pl-5 mb-4 space-y-1;
+}
+
+.prose-te ol {
+  @apply list-decimal pl-5 mb-4 space-y-1;
+}
+
+.prose-te li {
+  @apply text-te-text/90;
+}
+
+.prose-te h1,
+.prose-te h2,
+.prose-te h3,
+.prose-te h4 {
+  @apply font-body font-semibold text-te-text mt-6 mb-3;
+}
+
+.prose-te h1 { @apply text-xl; }
+.prose-te h2 { @apply text-lg; }
+.prose-te h3 { @apply text-base; }
+
+.prose-te hr {
+  @apply border-te-border my-6;
+}
+
+.prose-te table {
+  @apply w-full text-sm border-collapse my-4;
+}
+
+.prose-te th {
+  @apply font-mono text-[0.65rem] text-te-muted tracking-widest uppercase border-b border-te-border px-3 py-2 text-left;
+}
+
+.prose-te td {
+  @apply border-b border-te-border/50 px-3 py-2 text-te-text/80;
+}
+
+/* Discourse-specific elements */
+.prose-te .mention {
+  @apply text-te-orange/80 font-medium;
+}
+
+.prose-te .d-image-grid {
+  @apply grid grid-cols-2 md:grid-cols-3 gap-2 my-4;
+}
+
+.prose-te .d-image-grid img {
+  @apply w-full h-auto object-cover aspect-square my-0;
+}
+
+.prose-te aside.quote {
+  @apply bg-te-surface border border-te-border rounded p-4 my-4;
+}
+
+.prose-te aside.quote .title {
+  @apply font-mono text-[0.65rem] text-te-orange tracking-widest uppercase mb-2;
+}
+
+/* Thread closed banner */
+.thread-closed-banner {
+  @apply bg-te-orange text-te-black font-mono text-[0.65rem] tracking-[0.2em] uppercase;
+}
+
+/* Image grid inside posts */
+.prose-te figure {
+  @apply my-4;
+}
+
+.prose-te figcaption {
+  @apply font-mono text-[0.65rem] text-te-muted mt-1 tracking-wide;
+}
+
+/* Loading state */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    #1c1c1a 25%,
+    #2a2a28 50%,
+    #1c1c1a 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
