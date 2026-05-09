@@ -1,13 +1,20 @@
 import { usePosts } from './hooks/usePosts'
 import { useUrlMap } from './hooks/useUrlMap'
 import { useSearch } from './hooks/useSearch'
+import { useHashSync } from './hooks/useCurrentPost'
 import { Hero } from './components/Hero'
 import { StatsTicker } from './components/StatsTicker'
 import { ThreadNav } from './components/ThreadNav'
 import { PostList } from './components/PostList'
+import { ScrollBar } from './components/ScrollBar'
 import { Footer } from './components/Footer'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import type { Stats } from './types'
+
+interface VirtualizerInfo {
+  scrollMargin: number
+  getTotalSize: () => number
+}
 
 function LoadingScreen() {
   return (
@@ -25,36 +32,13 @@ function LoadingScreen() {
   )
 }
 
-// Thread-closed warning banner (post 1 has staff note in cooked)
-function ClosedBanner() {
-  return (
-    <div className="bg-te-orange px-4 md:px-8 py-3">
-      <div className="max-w-5xl mx-auto flex items-center gap-3">
-        <span className="font-mono text-te-black text-[0.6rem] tracking-[0.2em] uppercase font-medium">
-          Thread closed
-        </span>
-        <span className="font-mono text-te-black/60 text-[0.6rem]">&mdash;</span>
-        <span className="font-body text-te-black text-xs">
-          Ongoing discussion at{' '}
-          <a
-            href="https://discord.gg/y4V6VfHYck"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline font-medium hover:opacity-70 transition-opacity"
-          >
-            discord.gg/y4V6VfHYck
-          </a>
-        </span>
-      </div>
-    </div>
-  )
-}
-
 export function App() {
   const { posts, loading } = usePosts()
   const urlMap = useUrlMap()
   const { query, setQuery, topicFilter, setTopicFilter, filtered } = useSearch(posts)
   const [stats, setStats] = useState<Stats | null>(null)
+  const [virtualizerInfo, setVirtualizerInfo] = useState<VirtualizerInfo | null>(null)
+  const virtualizerInfoRef = useRef<VirtualizerInfo | null>(null)
 
   useEffect(() => {
     fetch('/metadata/stats.json')
@@ -63,15 +47,20 @@ export function App() {
       .catch(() => {})
   }, [])
 
+  const handleVirtualizerReady = useCallback((info: VirtualizerInfo) => {
+    virtualizerInfoRef.current = info
+    setVirtualizerInfo(info)
+  }, [])
+
+  // Sync URL hash with scroll position
+  useHashSync(posts, virtualizerInfo)
+
   if (loading) return <LoadingScreen />
 
   return (
     <>
       <Hero stats={stats} />
       <StatsTicker />
-
-      {/* Thread closed banner */}
-      <ClosedBanner />
 
       {/* Thread nav (fixed, appears after hero scrolls off) */}
       <ThreadNav
@@ -82,6 +71,9 @@ export function App() {
         filteredCount={filtered.length}
         totalCount={posts.length}
       />
+
+      {/* Timeline scrollbar (fixed right edge) */}
+      <ScrollBar posts={posts} virtualizerInfo={virtualizerInfo} />
 
       {/* Thread section */}
       <main id="thread" className="bg-te-black">
@@ -112,6 +104,7 @@ export function App() {
           posts={filtered}
           urlMap={urlMap}
           isEmpty={filtered.length === 0}
+          onVirtualizerReady={handleVirtualizerReady}
         />
       </main>
 

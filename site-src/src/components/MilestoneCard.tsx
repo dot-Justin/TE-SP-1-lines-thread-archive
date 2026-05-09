@@ -55,10 +55,16 @@ export function MilestoneCard({ post, urlMap }: MilestoneCardProps) {
             </p>
           </div>
 
-          {/* Post number tag */}
-          <div className="flex-shrink-0 font-mono text-te-orange text-xs tracking-widest border border-te-orange/40 px-3 py-1.5 rounded">
+          {/* Post number tag — links to original forum post */}
+          <a
+            href={`https://llllllll.co/t/te-stem-player/66795/${post.num}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-shrink-0 font-mono text-te-orange text-xs tracking-widest border border-te-orange/40 px-3 py-1.5 rounded hover:border-te-orange hover:bg-te-orange/10 transition-colors"
+            title="View on llllllll.co"
+          >
             #{numStr}
-          </div>
+          </a>
         </div>
 
         {/* Post meta */}

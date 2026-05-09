@@ -1,15 +1,21 @@
-import { useRef, useState, useLayoutEffect } from 'react'
+import { useRef, useState, useLayoutEffect, useEffect } from 'react'
 import { useWindowVirtualizer } from '@tanstack/react-virtual'
 import { PostCard } from './PostCard'
 import type { Post } from '../types'
+
+interface VirtualizerInfo {
+  scrollMargin: number
+  getTotalSize: () => number
+}
 
 interface PostListProps {
   posts: Post[]
   urlMap: Record<string, string>
   isEmpty: boolean
+  onVirtualizerReady?: (info: VirtualizerInfo) => void
 }
 
-export function PostList({ posts, urlMap, isEmpty }: PostListProps) {
+export function PostList({ posts, urlMap, isEmpty, onVirtualizerReady }: PostListProps) {
   const listRef = useRef<HTMLDivElement>(null)
   const [scrollMargin, setScrollMargin] = useState(0)
 
@@ -26,6 +32,16 @@ export function PostList({ posts, urlMap, isEmpty }: PostListProps) {
     overscan: 4,
     scrollMargin,
   })
+
+  // Notify parent when virtualizer is ready
+  useEffect(() => {
+    if (scrollMargin > 0 && onVirtualizerReady) {
+      onVirtualizerReady({
+        scrollMargin,
+        getTotalSize: () => virtualizer.getTotalSize(),
+      })
+    }
+  }, [scrollMargin, onVirtualizerReady, virtualizer])
 
   const items = virtualizer.getVirtualItems()
 

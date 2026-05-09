@@ -89,7 +89,10 @@ export function ThreadNav({
           </div>
 
           {/* Topic filters */}
-          <div className="flex gap-1 pb-2 overflow-x-auto scrollbar-none">
+          <div className="flex items-center gap-2 pb-2 overflow-x-auto scrollbar-none">
+            <span className="font-mono text-[0.5rem] text-te-muted tracking-[0.2em] uppercase flex-shrink-0 hidden sm:block">
+              FILTER
+            </span>
             {TOPICS.map(({ id, label }) => (
               <button
                 key={id}

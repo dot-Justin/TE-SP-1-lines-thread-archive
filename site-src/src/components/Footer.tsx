@@ -78,10 +78,15 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="mt-16 pt-6 border-t border-te-border flex flex-wrap justify-between items-center gap-4">
           <span className="font-mono text-[0.6rem] text-te-muted tracking-[0.15em] uppercase">
-            Archived May 2026 &middot; dotJustin
-          </span>
-          <span className="font-mono text-[0.6rem] text-te-muted tracking-[0.15em] uppercase">
-            nRF52840 &middot; CS42L42 &middot; TAS2505 &middot; 4GB eMMC
+            ARCHIVED 05-09-2026 BY{' '}
+            <a
+              href="https://github.com/dot-Justin/TE-SP-1-lines-thread-archive"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-te-orange hover:underline"
+            >
+              DOTJUSTIN
+            </a>
           </span>
         </div>
       </div>

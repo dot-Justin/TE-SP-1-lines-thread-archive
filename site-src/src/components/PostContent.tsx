@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import DOMPurify from 'dompurify'
 import { rewriteCooked, cleanDiscourseHtml } from '../lib/rewriteCooked'
-import { highlightTermsInHtml } from '../lib/highlightTerms'
 
 // DOMPurify config: allow images and links from local + known safe origins
 const PURIFY_CONFIG = {
@@ -32,7 +31,6 @@ export function PostContent({ cooked, urlMap }: PostContentProps) {
   const safeHtml = useMemo(() => {
     let processed = rewriteCooked(cooked, urlMap)
     processed = cleanDiscourseHtml(processed)
-    processed = highlightTermsInHtml(processed)
     return DOMPurify.sanitize(processed, PURIFY_CONFIG) as string
   }, [cooked, urlMap])
 

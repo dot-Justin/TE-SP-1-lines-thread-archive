@@ -26,14 +26,18 @@ export const PostCard = memo(function PostCard({ post, urlMap }: PostCardProps) 
       <div className="max-w-5xl mx-auto px-4 md:px-8 py-6">
         {/* Post header */}
         <div className="flex items-center justify-between mb-4">
-          {/* Post number */}
-          <span
-            className={`font-mono text-xs tracking-widest ${
+          {/* Post number — links to original forum post */}
+          <a
+            href={`https://llllllll.co/t/te-stem-player/66795/${post.num}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`font-mono text-xs tracking-widest hover:text-te-orange transition-colors ${
               isHighLiked ? 'text-te-orange' : 'text-te-muted'
             }`}
+            title="View on llllllll.co"
           >
             #{numStr}
-          </span>
+          </a>
         </div>
 
         {/* Author + meta */}

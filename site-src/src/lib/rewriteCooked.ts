@@ -25,10 +25,14 @@ export function rewriteCooked(html: string, urlMap: Record<string, string>): str
   })
 }
 
-// Strips lightbox wrappers from Discourse-generated HTML
+// Strips lightbox wrappers from Discourse-generated HTML and fixes relative links
 export function cleanDiscourseHtml(html: string): string {
+  // Remove onebox embeds (Discourse link-preview cards) — the actual <a> links
+  // are already present in the surrounding text, so nothing of value is lost
+  let clean = html.replace(/<aside[^>]*class="[^"]*onebox[^"]*"[\s\S]*?<\/aside>/gi, '')
+
   // Remove lightbox wrapper anchors but keep the img inside
-  let clean = html.replace(
+  clean = clean.replace(
     /<a[^>]*class="[^"]*lightbox[^"]*"[^>]*>([\s\S]*?)<\/a>/gi,
     (_, inner) => inner
   )
@@ -36,16 +40,21 @@ export function cleanDiscourseHtml(html: string): string {
   // Remove the meta/details elements Discourse adds to lightboxes
   clean = clean.replace(/<div[^>]*class="[^"]*meta[^"]*"[^>]*>[\s\S]*?<\/div>/gi, '')
   clean = clean.replace(/<[^>]*data-base62-sha1[^>]*>/g, (tag) => {
-    // Keep img tags but remove extra lightbox attributes
     return tag
       .replace(/\s+data-base62-sha1="[^"]*"/, '')
       .replace(/\s+data-download-href="[^"]*"/, '')
   })
 
+  // Fix Discourse relative links → absolute llllllll.co URLs
+  // Covers @mentions (/u/), topic links (/t/), category links (/c/)
+  clean = clean.replace(/href="\/u\//g, 'href="https://llllllll.co/u/')
+  clean = clean.replace(/href="\/t\//g, 'href="https://llllllll.co/t/')
+  clean = clean.replace(/href="\/c\//g, 'href="https://llllllll.co/c/')
+
   // Open all external links in new tab
   clean = clean.replace(/<a\s/gi, '<a target="_blank" rel="noopener noreferrer" ')
 
-  // Remove duplicate target attributes
+  // Remove duplicate target attributes introduced by the step above
   clean = clean.replace(/target="_blank"[^>]*target="_blank"/gi, (m) =>
     m.replace(/target="_blank"\s*/, '')
   )

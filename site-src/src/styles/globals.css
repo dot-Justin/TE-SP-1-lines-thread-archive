@@ -2,11 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
 /* Base page styles */
 body {
   @apply bg-te-black text-te-text font-body;
@@ -23,10 +18,9 @@ body {
   display: none;
 }
 
-/* Technical term highlight (set in highlightTerms.ts) */
-.term-highlight {
-  @apply font-mono text-te-orange text-[0.8em] border-b border-te-orange/40 pb-px;
-  font-size: inherit;
+/* Hide Discourse emoji images (external, can't mirror) */
+.prose-te img[src*="/images/emoji/"] {
+  display: none;
 }
 
 /* Post content prose styles */
