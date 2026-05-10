@@ -38,16 +38,22 @@ export function rewriteCooked(html: string, urlMap: Record<string, string>): str
     .replace(/src="\/uploads\//g, 'src="https://llllllll.co/uploads/')
 
   return normalized.replace(UPLOAD_RE, (match) => {
-    // Try exact match first
-    if (urlMap[match]) return urlMap[match]
-
-    // Extract the sha1 hash from the URL path
-    // URLs look like: /uploads/default/original/3X/a/b/HASH.ext
-    // or: /uploads/default/optimized/3X/a/b/HASH_2_WxH.ext
+    // Extract SHA1 first — the short-hash key in url-map always points to the
+    // full-resolution original, whereas the exact URL key may point to a
+    // compressed/resized "optimized" variant. Prefer originals.
     const sha1Match = match.match(/\/([0-9a-f]{40})(?:[._][^/]*)?$/)
     if (sha1Match) {
       const sha1 = sha1Match[1]
-      // Look for any entry in urlMap that contains this sha1
+      // Short 40-char key → original file (highest priority)
+      if (urlMap[sha1]) return urlMap[sha1]
+    }
+
+    // Exact URL match — may be an optimized/resized variant
+    if (urlMap[match]) return urlMap[match]
+
+    // Last-resort SHA1 scan (handles edge cases with different key formats)
+    if (sha1Match) {
+      const sha1 = sha1Match[1]
       const mapKey = Object.keys(urlMap).find(k => k.includes(sha1))
       if (mapKey) return urlMap[mapKey]
     }
@@ -129,8 +135,28 @@ export function cleanDiscourseHtml(html: string): string {
     iframe.replaceWith(p)
   })
 
+  // Inject a "jump to original post" link into each quote's title bar
+  doc.querySelectorAll('aside.quote[data-post]').forEach(aside => {
+    const postNum = parseInt(aside.getAttribute('data-post') ?? '0', 10)
+    if (!postNum) return
+    const titleDiv = aside.querySelector('div.title')
+    if (!titleDiv) return
+    const a = doc.createElement('a')
+    a.className = 'quote-jump-link'
+    a.setAttribute('data-jump-post', String(postNum))
+    a.href = '#'
+    a.textContent = `#${String(postNum).padStart(4, '0')}`
+    titleDiv.appendChild(a)
+  })
+
   // Remove Discourse lightbox meta divs
   doc.querySelectorAll('div.meta').forEach(el => el.remove())
+
+  // Remove spurious direct children of image grids that pollute the CSS grid layout.
+  // Discourse emits images either as separate <p><div>...</div></p> entries or as a single <p>
+  // with all images separated by <br>. HTML5 parsing of <p><div> creates empty sibling <p>s;
+  // <br> separators land as direct grid children. Both become unwanted grid cells.
+  doc.querySelectorAll('.d-image-grid > p, .d-image-grid > br').forEach(el => el.remove())
 
   // Strip data-base62-sha1 / data-download-href attributes
   doc.querySelectorAll('[data-base62-sha1]').forEach(el => {

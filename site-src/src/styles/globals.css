@@ -42,6 +42,15 @@ body {
   height: auto;
 }
 
+.prose-te img:not(.emoji):not(.avatar) {
+  cursor: zoom-in;
+}
+
+/* "jump to original post" link injected into aside.quote title divs */
+.prose-te .quote-jump-link {
+  @apply font-mono text-[0.58rem] text-te-orange/60 hover:text-te-orange no-underline ml-2 tracking-wider transition-colors cursor-pointer;
+}
+
 .prose-te code {
   @apply font-mono text-te-green bg-te-surface px-1.5 py-0.5 rounded text-[0.85em];
 }

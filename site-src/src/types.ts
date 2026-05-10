@@ -23,6 +23,18 @@ export interface Stats {
   topic_title: string
 }
 
+export interface ImageMeta {
+  src: string
+  alt: string
+  width: number
+  height: number
+  dominantColor?: string
+  filesize?: string
+  postNum: number
+  author: string
+  date: string
+}
+
 export type TopicFilter =
   | 'all'
   | 'hardware'

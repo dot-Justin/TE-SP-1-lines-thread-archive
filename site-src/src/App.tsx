@@ -3,6 +3,7 @@ import { useUrlMap } from './hooks/useUrlMap'
 import { useAvatarMap } from './hooks/useAvatarMap'
 import { useSearch } from './hooks/useSearch'
 import { useHashSync } from './hooks/useCurrentPost'
+import { useImageViewerState, ImageViewerContext } from './hooks/useImageViewer'
 import { Hero } from './components/Hero'
 import { StatsTicker } from './components/StatsTicker'
 import { ThreadNav } from './components/ThreadNav'
@@ -10,6 +11,8 @@ import { PostList } from './components/PostList'
 import { ScrollBar } from './components/ScrollBar'
 import { Footer } from './components/Footer'
 import { StickyNavFooter } from './components/StickyNavFooter'
+import { ImageViewer } from './components/ImageViewer'
+import { extractImages } from './lib/extractImages'
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { Stats, Post } from './types'
@@ -18,6 +21,7 @@ interface VirtualizerInfo {
   scrollMargin: number
   getTotalSize: () => number
   scrollToIndex: (index: number) => void
+  getItemOffset: (index: number) => number
 }
 
 function LoadingScreen() {
@@ -82,6 +86,22 @@ export function App() {
     }
   }, [loading])
 
+  const allImages = useMemo(
+    () => (!loading && Object.keys(urlMap).length > 0) ? extractImages(posts, urlMap) : [],
+    [posts, urlMap, loading]
+  )
+
+  // Defined early so it can be passed into useImageViewerState
+  const virtualizerInfoRef = useRef<VirtualizerInfo | null>(null)
+  const handleTickerNavigate = useCallback((postNum: number) => {
+    const info = virtualizerInfoRef.current
+    if (!info) return
+    const idx = posts.findIndex(p => p.num === postNum)
+    if (idx !== -1) info.scrollToIndex(idx)
+  }, [posts])
+
+  const imageViewerState = useImageViewerState(allImages, handleTickerNavigate)
+
   const {
     query, setQuery,
     matchIndices, matchPostNums,
@@ -91,7 +111,6 @@ export function App() {
   const [stats, setStats] = useState<Stats | null>(null)
   const [virtualizerInfo, setVirtualizerInfo] = useState<VirtualizerInfo | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
-  const virtualizerInfoRef = useRef<VirtualizerInfo | null>(null)
 
   useEffect(() => {
     fetch('/metadata/stats.json')
@@ -115,20 +134,13 @@ export function App() {
     virtualizerInfo.scrollToIndex(matchIndices[currentMatchIdx])
   }, [currentMatchIdx, matchIndices, virtualizerInfo])
 
-  // Ticker navigation: resolve post num → virtualizer index
-  const handleTickerNavigate = useCallback((postNum: number) => {
-    const info = virtualizerInfoRef.current
-    if (!info) return
-    const idx = posts.findIndex(p => p.num === postNum)
-    if (idx !== -1) info.scrollToIndex(idx)
-  }, [posts])
-
   // Sync URL hash with scroll position
   useHashSync(posts, virtualizerInfo)
 
   return (
-    <>
+    <ImageViewerContext.Provider value={imageViewerState}>
       <AnimatePresence>{showLoader && <LoadingScreen />}</AnimatePresence>
+      <ImageViewer />
       <Hero stats={stats} />
       <StatsTicker onNavigate={handleTickerNavigate} />
 
@@ -167,6 +179,6 @@ export function App() {
       </main>
 
       <Footer />
-    </>
+    </ImageViewerContext.Provider>
   )
 }

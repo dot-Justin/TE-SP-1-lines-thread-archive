@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import type { Post } from '../types'
 import { MILESTONES } from '../lib/milestones'
 
@@ -6,6 +6,7 @@ interface VirtualizerInfo {
   scrollMargin: number
   getTotalSize: () => number
   scrollToIndex: (index: number) => void
+  getItemOffset: (index: number) => number
 }
 
 interface ScrollBarProps {
@@ -85,18 +86,21 @@ export function ScrollBar({ posts, virtualizerInfo, currentIndex }: ScrollBarPro
     window.addEventListener('mouseup', onUp)
   }, [jumpToFraction, getFractionFromPointer])
 
-  // Milestone ticks
-  const milestoneTicks = Object.keys(MILESTONES).map(numStr => {
-    const num = Number(numStr)
-    const idx = posts.findIndex(p => p.num === num)
-    if (idx === -1) return null
-    return {
-      fraction: idx / Math.max(1, posts.length - 1),
-      label: MILESTONES[num].label,
-      num,
-      idx,
-    }
-  }).filter(Boolean) as { fraction: number; label: string; num: number; idx: number }[]
+  // Milestone ticks — positioned by post index fraction (reliable, ~accurate)
+  const milestoneTicks = useMemo(() => {
+    if (posts.length === 0) return []
+    return Object.keys(MILESTONES).map(numStr => {
+      const num = Number(numStr)
+      const idx = posts.findIndex(p => p.num === num)
+      if (idx === -1) return null
+      return {
+        fraction: idx / Math.max(1, posts.length - 1),
+        label: MILESTONES[num].label,
+        num,
+        idx,
+      }
+    }).filter(Boolean) as { fraction: number; label: string; num: number; idx: number }[]
+  }, [posts])
 
   if (posts.length === 0) return null
 
@@ -104,17 +108,23 @@ export function ScrollBar({ posts, virtualizerInfo, currentIndex }: ScrollBarPro
 
   return (
     <>
-      {/* Mobile: thin reading progress bar on right edge */}
-      {visible && (
-        <div className="md:hidden fixed right-0 top-0 h-full w-[2px] z-40 bg-te-border">
+      {/* Mobile: thin orange reading-progress bar — purely visual */}
+      <div className="md:hidden fixed right-0 top-0 h-full w-[3px] z-40 pointer-events-none">
+        <div
+          className="w-full bg-te-orange/70 transition-none"
+          style={{ height: `${fraction * 100}%` }}
+        />
+        {/* Milestone dots — purely visual */}
+        {milestoneTicks.map(tick => (
           <div
-            className="w-full bg-te-orange transition-none"
-            style={{ height: `${fraction * 100}%` }}
+            key={tick.num}
+            className="absolute w-[7px] h-[7px] rounded-full bg-te-orange border border-te-black"
+            style={{ top: `${tick.fraction * 100}%`, right: 0, transform: 'translateY(-50%)' }}
           />
-        </div>
-      )}
+        ))}
+      </div>
 
-      {/* Desktop: styled scrollbar */}
+      {/* Desktop: styled interactive scrollbar */}
       {visible && (
         <div
           className="hidden md:flex fixed right-2 md:right-3 top-1/2 -translate-y-1/2 z-40 flex-col items-center select-none"
@@ -134,7 +144,7 @@ export function ScrollBar({ posts, virtualizerInfo, currentIndex }: ScrollBarPro
               style={{ height: `${thumbPct}%` }}
             />
 
-            {/* Milestone ticks — small orange dots */}
+            {/* Milestone ticks — larger hit area, small visual dot */}
             {milestoneTicks.map(tick => (
               <div
                 key={tick.num}
@@ -142,6 +152,8 @@ export function ScrollBar({ posts, virtualizerInfo, currentIndex }: ScrollBarPro
                 style={{ top: `${tick.fraction * 100}%` }}
                 onClick={(e) => { e.stopPropagation(); virtualizerInfo?.scrollToIndex(tick.idx) }}
               >
+                {/* Enlarged invisible hit area */}
+                <div className="absolute -inset-2" />
                 <div className="w-[5px] h-[5px] rounded-full bg-te-orange/60 group-hover:bg-te-orange transition-colors" />
                 {/* Tooltip on hover */}
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
@@ -152,13 +164,15 @@ export function ScrollBar({ posts, virtualizerInfo, currentIndex }: ScrollBarPro
               </div>
             ))}
 
-            {/* Thumb — horizontal notch */}
+            {/* Thumb — horizontal notch with enlarged grab area */}
             <div
-              className={`absolute left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing group`}
+              className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing group"
               style={{ top: `${thumbPct}%` }}
               onMouseDown={onThumbMouseDown}
               onClick={e => e.stopPropagation()}
             >
+              {/* Enlarged invisible grab area */}
+              <div className="absolute -inset-x-3 -inset-y-2" />
               {/* Notch bar */}
               <div
                 className={`w-3 h-[2px] bg-te-orange transition-all ${isDragging ? 'w-4' : ''}`}
@@ -166,7 +180,7 @@ export function ScrollBar({ posts, virtualizerInfo, currentIndex }: ScrollBarPro
 
               {/* Floating label — appears on hover or drag */}
               {(hovering || isDragging) && currentPost && (
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none whitespace-nowrap">
+                <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none whitespace-nowrap">
                   <div className="flex items-baseline gap-1.5 bg-te-black border border-te-border px-2 py-1 rounded">
                     <span className="font-mono text-[0.5rem] text-te-orange tracking-widest leading-none">
                       #{currentPost.num}

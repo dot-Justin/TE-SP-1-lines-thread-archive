@@ -7,6 +7,7 @@ interface VirtualizerInfo {
   scrollMargin: number
   getTotalSize: () => number
   scrollToIndex: (index: number) => void
+  getItemOffset: (index: number) => number
 }
 
 interface PostListProps {
@@ -47,6 +48,8 @@ export function PostList({ posts, urlMap, avatarMap, replyIndex, postMap, isEmpt
         scrollMargin,
         getTotalSize: () => virtualizer.getTotalSize(),
         scrollToIndex: (index: number) => virtualizer.scrollToIndex(index, { align: 'start' }),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        getItemOffset: (index: number) => (virtualizer as any).getMeasurements()[index]?.start ?? index * 500,
       })
     }
   }, [scrollMargin, onVirtualizerReady, virtualizer])
