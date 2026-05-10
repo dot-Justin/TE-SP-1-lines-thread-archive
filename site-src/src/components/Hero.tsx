@@ -2,6 +2,7 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import { CaretDown } from '@phosphor-icons/react'
 import type { Stats } from '../types'
+import { SP1Device } from './SP1Device'
 
 interface HeroProps {
   stats: Stats | null
@@ -130,13 +131,10 @@ export function Hero({ stats }: HeroProps) {
           )}
         </div>
 
-        {/* Right: device image — same height as text column, top-aligned */}
-        <img
-          src="/sp-01.svg"
-          alt="TE-SP-1 Stem Player device"
-          className="flex-shrink-0 self-stretch object-contain object-top w-28 md:w-48 lg:w-64 pointer-events-none select-none"
-          draggable={false}
-        />
+        {/* Right: interactive device */}
+        <div className="flex-shrink-0 self-stretch w-28 md:w-48 lg:w-64">
+          <SP1Device />
+        </div>
       </div>
 
       {/* Scroll indicator */}
