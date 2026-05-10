@@ -115,6 +115,14 @@ export function App() {
     virtualizerInfo.scrollToIndex(matchIndices[currentMatchIdx])
   }, [currentMatchIdx, matchIndices, virtualizerInfo])
 
+  // Ticker navigation: resolve post num → virtualizer index
+  const handleTickerNavigate = useCallback((postNum: number) => {
+    const info = virtualizerInfoRef.current
+    if (!info) return
+    const idx = posts.findIndex(p => p.num === postNum)
+    if (idx !== -1) info.scrollToIndex(idx)
+  }, [posts])
+
   // Sync URL hash with scroll position
   useHashSync(posts, virtualizerInfo)
 
@@ -122,7 +130,7 @@ export function App() {
     <>
       <AnimatePresence>{showLoader && <LoadingScreen />}</AnimatePresence>
       <Hero stats={stats} />
-      <StatsTicker />
+      <StatsTicker onNavigate={handleTickerNavigate} />
 
       {/* Thread nav (fixed, appears after hero scrolls off) */}
       <ThreadNav

@@ -1,9 +1,20 @@
 import { useState } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { CaretDown, CaretUp, ArrowSquareOut } from '@phosphor-icons/react'
 import { PostContent } from './PostContent'
 import type { Post } from '../types'
 
 const MAX_DEPTH = 5
+
+// Stagger container: children animate in sequence
+const containerVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.04 } },
+}
+const itemVariants = {
+  hidden: { opacity: 0, y: 5 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.18, ease: [0.16, 1, 0.3, 1] as const } },
+}
 
 interface ReplyThreadProps {
   postNum: number
@@ -57,6 +68,7 @@ function ReplyItem({
   depth: number
 }) {
   const [expanded, setExpanded] = useState(false)
+  const prefersReduced = useReducedMotion()
   const childNums = replyIndex.get(post.num) ?? []
   const hasChildren = childNums.length > 0
   const atDepthCap = depth >= MAX_DEPTH
@@ -114,23 +126,43 @@ function ReplyItem({
                 onClick={() => setExpanded(v => !v)}
                 className="inline-flex items-center gap-1.5 font-mono text-[0.6rem] text-te-muted hover:text-te-orange tracking-wide transition-colors"
               >
-                {expanded ? <CaretUp size={10} /> : <CaretDown size={10} />}
+                <motion.span
+                  animate={{ rotate: expanded ? 180 : 0 }}
+                  transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                  style={{ display: 'flex' }}
+                >
+                  <CaretDown size={10} />
+                </motion.span>
                 {expanded ? 'hide' : childNums.length === 1 ? '1 reply' : `${childNums.length} replies`}
               </button>
             )}
           </div>
         )}
 
-        {expanded && !atDepthCap && (
-          <ReplyThread
-            postNum={post.num}
-            postMap={postMap}
-            replyIndex={replyIndex}
-            urlMap={urlMap}
-            avatarMap={avatarMap}
-            depth={depth + 1}
-          />
-        )}
+        <AnimatePresence>
+          {expanded && !atDepthCap && (
+            <motion.div
+              key="nested"
+              initial={prefersReduced ? false : { height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={prefersReduced ? {} : { height: 0, opacity: 0 }}
+              transition={{
+                height: { duration: 0.2, ease: [0.16, 1, 0.3, 1] },
+                opacity: { duration: 0.15 },
+              }}
+              style={{ overflow: 'hidden' }}
+            >
+              <ReplyThread
+                postNum={post.num}
+                postMap={postMap}
+                replyIndex={replyIndex}
+                urlMap={urlMap}
+                avatarMap={avatarMap}
+                depth={depth + 1}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   )
@@ -144,26 +176,36 @@ export function ReplyThread({
   avatarMap,
   depth = 1,
 }: ReplyThreadProps) {
+  const prefersReduced = useReducedMotion()
   const childNums = replyIndex.get(postNum) ?? []
   if (childNums.length === 0) return null
 
   return (
-    <div className="mt-4 border-l-2 border-te-border/50 pl-4 space-y-5">
+    <motion.div
+      className="mt-4 border-l-2 border-te-border/50 pl-4 space-y-5"
+      variants={prefersReduced ? undefined : containerVariants}
+      initial={prefersReduced ? false : 'hidden'}
+      animate={prefersReduced ? undefined : 'show'}
+    >
       {childNums.map(num => {
         const post = postMap.get(num)
         if (!post) return null
         return (
-          <ReplyItem
+          <motion.div
             key={num}
-            post={post}
-            postMap={postMap}
-            replyIndex={replyIndex}
-            urlMap={urlMap}
-            avatarMap={avatarMap}
-            depth={depth}
-          />
+            variants={prefersReduced ? undefined : itemVariants}
+          >
+            <ReplyItem
+              post={post}
+              postMap={postMap}
+              replyIndex={replyIndex}
+              urlMap={urlMap}
+              avatarMap={avatarMap}
+              depth={depth}
+            />
+          </motion.div>
         )
       })}
-    </div>
+    </motion.div>
   )
 }

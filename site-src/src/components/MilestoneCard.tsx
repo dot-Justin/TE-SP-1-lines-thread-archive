@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { CaretDown, CaretUp } from '@phosphor-icons/react'
 import { getMilestone } from '../lib/milestones'
 import { AuthorTag } from './AuthorTag'
@@ -107,16 +107,30 @@ export function MilestoneCard({ post, urlMap, avatarMap, replyIndex, postMap, is
                 {repliesOpen ? <CaretUp size={11} /> : <CaretDown size={11} />}
                 {repliesOpen ? 'hide replies' : directReplies.length === 1 ? '1 reply' : `${directReplies.length} replies`}
               </button>
-              {repliesOpen && (
-                <ReplyThread
-                  postNum={post.num}
-                  postMap={postMap}
-                  replyIndex={replyIndex}
-                  urlMap={urlMap}
-                  avatarMap={avatarMap}
-                  depth={1}
-                />
-              )}
+              <AnimatePresence>
+                {repliesOpen && (
+                  <motion.div
+                    key="replies"
+                    initial={prefersReduced ? false : { height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={prefersReduced ? {} : { height: 0, opacity: 0 }}
+                    transition={{
+                      height: { duration: 0.22, ease: [0.16, 1, 0.3, 1] },
+                      opacity: { duration: 0.18 },
+                    }}
+                    style={{ overflow: 'hidden' }}
+                  >
+                    <ReplyThread
+                      postNum={post.num}
+                      postMap={postMap}
+                      replyIndex={replyIndex}
+                      urlMap={urlMap}
+                      avatarMap={avatarMap}
+                      depth={1}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </>
           )
         })()}
