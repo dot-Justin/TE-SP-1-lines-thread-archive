@@ -15,10 +15,10 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const REPO_ROOT = join(__dirname, '..', '..')
 
-const MANIFEST_PATH = join(REPO_ROOT, 'docs', 'metadata', 'upload_manifest.json')
+const MANIFEST_PATH = join(REPO_ROOT, 'site-src', 'public', 'metadata', 'upload_manifest.json')
 const RAW_UPLOADS  = join(REPO_ROOT, 'raw', 'assets', 'uploads')
-const OUT_UPLOADS  = join(REPO_ROOT, 'docs', 'assets', 'uploads')
-const OUT_MAP      = join(REPO_ROOT, 'docs', 'assets', 'url-map.json')
+const OUT_UPLOADS  = join(REPO_ROOT, 'site-src', 'public', 'assets', 'uploads')
+const OUT_MAP      = join(REPO_ROOT, 'site-src', 'public', 'assets', 'url-map.json')
 
 // Magic byte signatures for common image/file types
 function detectExtension(buf) {

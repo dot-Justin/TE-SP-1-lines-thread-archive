@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview --outDir ../docs",
+    "preview": "vite preview",
+    "start": "npm run build && npx serve dist -l 8080",
     "prep-assets": "node scripts/prep-assets.mjs"
   },
   "dependencies": {
