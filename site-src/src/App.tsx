@@ -140,6 +140,7 @@ export function App() {
         currentMatchIdx={currentMatchIdx}
         goNext={goNext}
         goPrev={goPrev}
+        posts={posts}
       />
 
       {/* Timeline scrollbar (fixed right edge) */}

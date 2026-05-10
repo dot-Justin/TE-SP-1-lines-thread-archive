@@ -1,5 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { MagnifyingGlass, X, ArrowUp, ArrowDown } from '@phosphor-icons/react'
+import { SearchBuilder } from './SearchBuilder'
+import type { Post } from '../types'
 
 interface ThreadNavProps {
   query: string
@@ -8,6 +10,7 @@ interface ThreadNavProps {
   currentMatchIdx: number
   goNext: () => void
   goPrev: () => void
+  posts: Post[]
 }
 
 export function ThreadNav({
@@ -17,9 +20,12 @@ export function ThreadNav({
   currentMatchIdx,
   goNext,
   goPrev,
+  posts,
 }: ThreadNavProps) {
   const [visible, setVisible] = useState(false)
+  const [builderOpen, setBuilderOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const navRef = useRef<HTMLDivElement>(null)
 
   // Show nav after hero scrolls off
   useEffect(() => {
@@ -38,23 +44,38 @@ export function ThreadNav({
       if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
         e.preventDefault()
         setVisible(true)
-        // Small delay lets the nav finish sliding in before focusing
+        setBuilderOpen(true)
         requestAnimationFrame(() => inputRef.current?.focus())
       }
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [setVisible])
+  }, [])
+
+  // Close builder on click outside the nav
+  useEffect(() => {
+    if (!builderOpen) return
+    const handleMouseDown = (e: MouseEvent) => {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        setBuilderOpen(false)
+        inputRef.current?.blur()
+      }
+    }
+    document.addEventListener('mousedown', handleMouseDown)
+    return () => document.removeEventListener('mousedown', handleMouseDown)
+  }, [builderOpen])
 
   const hasQuery = query.trim().length > 0
 
   return (
     <div
+      ref={navRef}
       className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ${
         visible ? 'translate-y-0' : '-translate-y-full'
       }`}
     >
-      <div className="bg-te-black/95 backdrop-blur-md border-b border-te-border">
+      {/* Main nav bar */}
+      <div className="bg-te-black/95 backdrop-blur-md border-b border-te-border relative">
         <div className="max-w-5xl mx-auto px-4 md:px-8">
           <div className="flex items-center gap-3 py-3">
             {/* Title */}
@@ -78,11 +99,27 @@ export function ThreadNav({
                 onChange={e => setQuery(e.target.value)}
                 placeholder="search by text, or by post #"
                 aria-label="Search posts"
-                className="w-full bg-te-surface border border-te-border text-te-text font-mono text-xs pl-8 pr-8 py-2 rounded focus:outline-none focus:border-te-orange placeholder:text-te-muted transition-colors"
+                className={`w-full bg-te-surface border text-te-text font-mono text-xs pl-8 pr-8 py-2 rounded focus:outline-none placeholder:text-te-muted transition-colors ${
+                  builderOpen ? 'border-te-orange/60' : 'border-te-border focus:border-te-orange'
+                }`}
+                onFocus={() => setBuilderOpen(true)}
+                onKeyDown={e => {
+                  if (e.key === 'Escape') {
+                    if (query) {
+                      setQuery('')
+                    } else {
+                      setBuilderOpen(false)
+                      inputRef.current?.blur()
+                    }
+                  }
+                  if (e.key === 'Enter') {
+                    setBuilderOpen(false)
+                  }
+                }}
               />
               {query && (
                 <button
-                  onClick={() => setQuery('')}
+                  onClick={() => { setQuery(''); inputRef.current?.focus() }}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-te-muted hover:text-te-text"
                   aria-label="Clear search"
                 >
@@ -91,7 +128,7 @@ export function ThreadNav({
               )}
             </div>
 
-            {/* Match navigation — shown when query is active */}
+            {/* Match navigation */}
             {hasQuery && totalMatches > 0 && (
               <div className="flex items-center gap-1 flex-shrink-0">
                 <button
@@ -114,7 +151,6 @@ export function ThreadNav({
               </div>
             )}
 
-            {/* No results indicator */}
             {hasQuery && totalMatches === 0 && (
               <span className="font-mono text-[0.55rem] text-te-muted tracking-wide flex-shrink-0">
                 no matches
@@ -122,6 +158,16 @@ export function ThreadNav({
             )}
           </div>
         </div>
+
+        {/* Query builder panel */}
+        {builderOpen && (
+          <SearchBuilder
+            query={query}
+            setQuery={setQuery}
+            posts={posts}
+            inputRef={inputRef}
+          />
+        )}
       </div>
     </div>
   )
