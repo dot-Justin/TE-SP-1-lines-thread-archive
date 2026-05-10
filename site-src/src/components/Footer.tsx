@@ -5,7 +5,6 @@ const LINKS = [
   { label: 'solderless.engineering', href: 'https://solderless.engineering/', note: 'web firmware updater' },
   { label: 'SP-1-dev on GitHub', href: 'https://github.com/timknapen/SP-1-dev', note: 'custom firmware' },
   { label: 'Original thread', href: 'https://llllllll.co/t/te-stem-player/66795', note: 'llllllll.co (closed)' },
-  { label: 'Belt clip', href: 'https://www.thingiverse.com/thing:7312090', note: '3D print by nonkillwingman' },
 ]
 
 function ExtLink({ href, children }: { href: string; children: React.ReactNode }) {

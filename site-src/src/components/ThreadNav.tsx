@@ -62,7 +62,7 @@ export function ThreadNav({
                 type="text"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
-                placeholder="search posts or #204..."
+                placeholder="search post text, or type post number"
                 aria-label="Search posts"
                 className="w-full bg-te-surface border border-te-border text-te-text font-mono text-xs pl-8 pr-8 py-2 rounded focus:outline-none focus:border-te-orange placeholder:text-te-muted transition-colors"
               />
