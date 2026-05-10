@@ -115,7 +115,7 @@ export function SearchBuilder({ query, setQuery, posts, inputRef }: SearchBuilde
 
   return (
     <div
-      className="absolute top-full left-0 right-0 z-[55] border-b border-te-border bg-te-black/98 backdrop-blur-md"
+      className="bg-te-black/95 backdrop-blur-md"
       // Prevent mousedown from blurring the main input
       onMouseDown={e => e.preventDefault()}
     >

@@ -1,7 +1,11 @@
 import { useEffect, useState, useRef } from 'react'
-import { MagnifyingGlass, X, ArrowUp, ArrowDown } from '@phosphor-icons/react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { MagnifyingGlass, X, ArrowUp, ArrowDown, CaretDown, CaretUp } from '@phosphor-icons/react'
 import { SearchBuilder } from './SearchBuilder'
 import type { Post } from '../types'
+
+// te-black: #131210 — used for concave corner decorations
+const TE_BLACK = '#131210'
 
 interface ThreadNavProps {
   query: string
@@ -11,6 +15,58 @@ interface ThreadNavProps {
   goNext: () => void
   goPrev: () => void
   posts: Post[]
+}
+
+/** Concave corner tab effect.
+ *
+ * Two te-black rectangles with a single rounded corner are placed on either
+ * side of the pull handle. Since they're the page background color they
+ * visually "carve" concave arcs into the header–handle junction — matching
+ * the reference image morphing effect.
+ *
+ * The handle itself has the same backdrop-blur/bg as the nav bar so the
+ * three pieces read as one connected floating shape.
+ */
+function PullHandle({ onClick }: { onClick: () => void }) {
+  return (
+    <div className="relative">
+      {/* Left concave corner: page-bg rect with border-bottom-right-radius */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-0 right-full"
+        style={{
+          width: 18,
+          height: 18,
+          background: TE_BLACK,
+          borderBottomRightRadius: 16,
+        }}
+      />
+
+      <motion.button
+        onClick={onClick}
+        className="flex items-center gap-1.5 bg-te-black/95 backdrop-blur-md px-5 py-1.5 rounded-b-xl transition-colors hover:bg-te-surface/60 select-none"
+        whileTap={{ scale: 0.97 }}
+        transition={{ duration: 0.1 }}
+      >
+        <CaretDown size={9} className="text-te-muted/70" />
+        <span className="font-mono text-[0.5rem] text-te-muted/60 tracking-[0.2em] uppercase">
+          filters
+        </span>
+      </motion.button>
+
+      {/* Right concave corner: page-bg rect with border-bottom-left-radius */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-0 left-full"
+        style={{
+          width: 18,
+          height: 18,
+          background: TE_BLACK,
+          borderBottomLeftRadius: 16,
+        }}
+      />
+    </div>
+  )
 }
 
 export function ThreadNav({
@@ -24,8 +80,17 @@ export function ThreadNav({
 }: ThreadNavProps) {
   const [visible, setVisible] = useState(false)
   const [builderOpen, setBuilderOpen] = useState(false)
+  // Once the builder has been opened, show the pull handle when closed
+  const [builderTouched, setBuilderTouched] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const navRef = useRef<HTMLDivElement>(null)
+
+  const openBuilder = () => {
+    setBuilderOpen(true)
+    setBuilderTouched(true)
+  }
+
+  const closeBuilder = () => setBuilderOpen(false)
 
   // Show nav after hero scrolls off
   useEffect(() => {
@@ -38,13 +103,13 @@ export function ThreadNav({
     return () => observer.disconnect()
   }, [])
 
-  // Intercept Ctrl+F / Cmd+F → focus our search input
+  // Ctrl+F / Cmd+F → focus our search bar
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
         e.preventDefault()
         setVisible(true)
-        setBuilderOpen(true)
+        openBuilder()
         requestAnimationFrame(() => inputRef.current?.focus())
       }
     }
@@ -52,17 +117,16 @@ export function ThreadNav({
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
-  // Close builder on click outside the nav
+  // Close builder on click outside nav
   useEffect(() => {
     if (!builderOpen) return
-    const handleMouseDown = (e: MouseEvent) => {
+    const handle = (e: MouseEvent) => {
       if (navRef.current && !navRef.current.contains(e.target as Node)) {
-        setBuilderOpen(false)
-        inputRef.current?.blur()
+        closeBuilder()
       }
     }
-    document.addEventListener('mousedown', handleMouseDown)
-    return () => document.removeEventListener('mousedown', handleMouseDown)
+    document.addEventListener('mousedown', handle)
+    return () => document.removeEventListener('mousedown', handle)
   }, [builderOpen])
 
   const hasQuery = query.trim().length > 0
@@ -74,11 +138,11 @@ export function ThreadNav({
         visible ? 'translate-y-0' : '-translate-y-full'
       }`}
     >
-      {/* Main nav bar */}
+      {/* ── Nav bar ── */}
       <div className="bg-te-black/95 backdrop-blur-md border-b border-te-border relative">
         <div className="max-w-5xl mx-auto px-4 md:px-8">
           <div className="flex items-center gap-3 py-3">
-            {/* Title */}
+            {/* Logo / title */}
             <div className="flex items-center gap-2 flex-shrink-0">
               <img src="/sp-01.svg" alt="" aria-hidden className="h-7 w-auto opacity-75" />
               <span className="font-display font-black text-te-text text-xl md:text-2xl tracking-tight uppercase leading-none">
@@ -86,7 +150,7 @@ export function ThreadNav({
               </span>
             </div>
 
-            {/* Search */}
+            {/* Search input */}
             <div className="flex-1 relative max-w-xs ml-auto">
               <MagnifyingGlass
                 size={14}
@@ -100,27 +164,25 @@ export function ThreadNav({
                 placeholder="search by text, or by post #"
                 aria-label="Search posts"
                 className={`w-full bg-te-surface border text-te-text font-mono text-xs pl-8 pr-8 py-2 rounded focus:outline-none placeholder:text-te-muted transition-colors ${
-                  builderOpen ? 'border-te-orange/60' : 'border-te-border focus:border-te-orange'
+                  builderOpen ? 'border-te-orange/50' : 'border-te-border focus:border-te-orange'
                 }`}
-                onFocus={() => setBuilderOpen(true)}
+                onFocus={openBuilder}
                 onKeyDown={e => {
                   if (e.key === 'Escape') {
                     if (query) {
                       setQuery('')
                     } else {
-                      setBuilderOpen(false)
+                      closeBuilder()
                       inputRef.current?.blur()
                     }
                   }
-                  if (e.key === 'Enter') {
-                    setBuilderOpen(false)
-                  }
+                  if (e.key === 'Enter') closeBuilder()
                 }}
               />
               {query && (
                 <button
                   onClick={() => { setQuery(''); inputRef.current?.focus() }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-te-muted hover:text-te-text"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-te-muted hover:text-te-text transition-colors"
                   aria-label="Clear search"
                 >
                   <X size={12} />
@@ -159,15 +221,58 @@ export function ThreadNav({
           </div>
         </div>
 
-        {/* Query builder panel */}
-        {builderOpen && (
-          <SearchBuilder
-            query={query}
-            setQuery={setQuery}
-            posts={posts}
-            inputRef={inputRef}
-          />
-        )}
+        {/* ── Builder drawer (slides down) ── */}
+        <AnimatePresence>
+          {builderOpen && (
+            <motion.div
+              key="drawer"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{
+                height: { duration: 0.28, ease: [0.16, 1, 0.3, 1] },
+                opacity: { duration: 0.2 },
+              }}
+              style={{ overflow: 'hidden' }}
+              className="border-t border-te-border/50"
+            >
+              <SearchBuilder
+                query={query}
+                setQuery={setQuery}
+                posts={posts}
+                inputRef={inputRef}
+              />
+
+              {/* Collapse button */}
+              <div className="flex justify-center pb-3 pt-0">
+                <button
+                  onMouseDown={e => e.preventDefault()}
+                  onClick={closeBuilder}
+                  className="inline-flex items-center gap-1 font-mono text-[0.5rem] text-te-muted/40 hover:text-te-muted/70 tracking-[0.2em] uppercase transition-colors"
+                >
+                  <CaretUp size={8} />
+                  collapse
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ── Pull handle (morphing tab with concave corners) ── */}
+        <AnimatePresence>
+          {builderTouched && !builderOpen && (
+            <motion.div
+              key="pull-handle"
+              className="absolute left-1/2 -translate-x-1/2 top-full z-[55]"
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <PullHandle onClick={openBuilder} />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   )
