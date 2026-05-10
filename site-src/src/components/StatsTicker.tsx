@@ -19,7 +19,6 @@ const ITEMS: TickerItem[] = [
   { text: 'MOST ACTIVE DAY: FRIDAY' },
   { text: '87% OF POSTS RECEIVED LIKES' },
   { text: 'ONE POST EARNED 83 HEARTS', href: '#257' },
-  { text: '86 MB OF DATA ARCHIVED' },
   { text: '156 POSTS IN A SINGLE MONTH' },
   { text: 'LONGEST POST: 902 WORDS', href: '#247' },
   { text: '574 CONVERSATIONS' },
