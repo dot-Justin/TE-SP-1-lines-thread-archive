@@ -40,7 +40,18 @@ function parseLikes(value: string): ((n: number) => boolean) | null {
 }
 
 export function useSearch(posts: Post[]) {
-  const [query, setQuery] = useState('')
+  const [query, setQueryRaw] = useState(
+    () => new URLSearchParams(window.location.search).get('q') ?? ''
+  )
+
+  const setQuery = (q: string) => {
+    setQueryRaw(q)
+    const params = new URLSearchParams(window.location.search)
+    if (q) params.set('q', q)
+    else params.delete('q')
+    const search = params.toString()
+    history.replaceState(null, '', search ? `?${search}${window.location.hash}` : window.location.pathname + window.location.hash)
+  }
   const [debouncedQuery, setDebouncedQuery] = useState('')
   const [currentMatchIdx, setCurrentMatchIdx] = useState(0)
 
