@@ -28,11 +28,11 @@ export function AuthorTag({ author, date, likes, replyTo }: AuthorTagProps) {
         {/* Reply indicator */}
         {replyTo && (
           <a
-            href={`#post-${replyTo}`}
+            href={`#${replyTo}`}
             className="font-mono text-[0.65rem] text-te-orange hover:underline tracking-wide"
             onClick={e => {
               e.preventDefault()
-              document.getElementById(`post-${replyTo}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+              document.getElementById(String(replyTo))?.scrollIntoView({ behavior: 'smooth', block: 'center' })
             }}
           >
             &#8627;&nbsp;#{String(replyTo).padStart(4, '0')}

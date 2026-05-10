@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { getMilestone } from '../lib/milestones'
 import { AuthorTag } from './AuthorTag'
 import { PostContent } from './PostContent'
@@ -11,6 +11,7 @@ interface MilestoneCardProps {
 }
 
 export function MilestoneCard({ post, urlMap, isMatch }: MilestoneCardProps) {
+  const prefersReduced = useReducedMotion()
   const milestone = getMilestone(post.num)
   if (!milestone) return null
 
@@ -19,10 +20,10 @@ export function MilestoneCard({ post, urlMap, isMatch }: MilestoneCardProps) {
   return (
     <motion.div
       id={String(post.num)}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      initial={prefersReduced ? false : { opacity: 0, y: 20 }}
+      whileInView={prefersReduced ? undefined : { opacity: 1, y: 0 }}
+      viewport={prefersReduced ? undefined : { once: true, margin: '-80px' }}
+      transition={prefersReduced ? undefined : { duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       className={`relative bg-te-surface2 border-y border-te-orange/30 overflow-hidden ${
         isMatch ? 'border-l-2 border-l-te-orange' : ''
       }`}

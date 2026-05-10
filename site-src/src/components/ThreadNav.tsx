@@ -63,6 +63,7 @@ export function ThreadNav({
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 placeholder="search posts or #204..."
+                aria-label="Search posts"
                 className="w-full bg-te-surface border border-te-border text-te-text font-mono text-xs pl-8 pr-8 py-2 rounded focus:outline-none focus:border-te-orange placeholder:text-te-muted transition-colors"
               />
               {query && (
@@ -81,7 +82,7 @@ export function ThreadNav({
               <div className="flex items-center gap-1 flex-shrink-0">
                 <button
                   onClick={goPrev}
-                  className="text-te-muted hover:text-te-orange transition-colors p-1"
+                  className="text-te-muted hover:text-te-orange transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
                   aria-label="Previous match"
                 >
                   <ArrowUp size={12} />
@@ -91,7 +92,7 @@ export function ThreadNav({
                 </span>
                 <button
                   onClick={goNext}
-                  className="text-te-muted hover:text-te-orange transition-colors p-1"
+                  className="text-te-muted hover:text-te-orange transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
                   aria-label="Next match"
                 >
                   <ArrowDown size={12} />

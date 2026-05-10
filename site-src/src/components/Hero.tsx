@@ -1,5 +1,5 @@
 'use client'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { CaretDown } from '@phosphor-icons/react'
 import type { Stats } from '../types'
 
@@ -29,6 +29,8 @@ const charVariants = {
 const TITLE = 'SP-1 ARCHIVE'
 
 export function Hero({ stats }: HeroProps) {
+  const prefersReduced = useReducedMotion()
+
   const scrollToThread = () => {
     const el = document.getElementById('thread')
     el?.scrollIntoView({ behavior: 'smooth' })
@@ -51,9 +53,9 @@ export function Hero({ stats }: HeroProps) {
         {/* Left: text */}
         <div className="flex-1 min-w-0">
           <motion.h1
-            variants={containerVariants}
-            initial="hidden"
-            animate="show"
+            variants={prefersReduced ? undefined : containerVariants}
+            initial={prefersReduced ? false : 'hidden'}
+            animate={prefersReduced ? false : 'show'}
             className="font-display font-black text-te-text uppercase leading-none tracking-tighter"
             style={{ fontSize: 'clamp(2.5rem, 9vw, 7.5rem)' }}
           >
