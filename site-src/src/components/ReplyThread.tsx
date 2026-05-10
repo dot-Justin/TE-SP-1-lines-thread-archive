@@ -1,16 +1,18 @@
 import { useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { CaretDown, CaretUp, ArrowSquareOut } from '@phosphor-icons/react'
+import { CaretDown, ArrowSquareOut } from '@phosphor-icons/react'
 import { PostContent } from './PostContent'
 import type { Post } from '../types'
 
 const MAX_DEPTH = 5
 
-// Stagger container: children animate in sequence
+// Item stagger: parent container sequences children with 40ms gaps
 const containerVariants = {
   hidden: {},
   show: { transition: { staggerChildren: 0.04 } },
 }
+
+// Each item slides up + fades; author chars and content animate on top of this
 const itemVariants = {
   hidden: { opacity: 0, y: 5 },
   show: { opacity: 1, y: 0, transition: { duration: 0.18, ease: [0.16, 1, 0.3, 1] as const } },
@@ -52,6 +54,34 @@ function Avatar({ src, author }: { src?: string; author: string }) {
   )
 }
 
+// Per-character soft-blur-in, adapted from soft-blur-in spec at micro scale:
+// blur 3px (spec: 12px → 6px for <24px text → 3px for 14px UI label)
+// y 2px (spec: 16px → 9px site → 2px for compact row)
+// duration 110ms per char, stagger 8ms
+// Parent opacity-fade compounds with this for a "materializing" effect — no separate opacity needed here
+function AnimatedName({ name, prefersReduced }: { name: string; prefersReduced: boolean | null }) {
+  if (prefersReduced) return <>{name}</>
+  return (
+    <>
+      {name.split('').map((char, i) => (
+        <motion.span
+          key={i}
+          initial={{ filter: 'blur(3px)', y: 2 }}
+          animate={{ filter: 'blur(0px)', y: 0 }}
+          transition={{
+            duration: 0.11,
+            delay: i * 0.008,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+          style={{ display: 'inline-block', whiteSpace: 'pre' }}
+        >
+          {char}
+        </motion.span>
+      ))}
+    </>
+  )
+}
+
 function ReplyItem({
   post,
   postMap,
@@ -72,25 +102,36 @@ function ReplyItem({
   const childNums = replyIndex.get(post.num) ?? []
   const hasChildren = childNums.length > 0
   const atDepthCap = depth >= MAX_DEPTH
+  const numStr = String(post.num).padStart(4, '0')
 
   return (
     <div>
       {/* Author row */}
       <div className="flex items-center gap-2 mb-2 flex-wrap">
         <Avatar src={avatarMap[post.author]} author={post.author} />
-        <span className="font-body font-medium text-te-text text-sm leading-none">{post.author}</span>
-        {post.reply_to !== null && (
-          <a
-            href={`#${post.reply_to}`}
-            className="font-mono text-[0.6rem] text-te-orange hover:underline tracking-wide leading-none"
-            onClick={e => {
+
+        {/* Name: per-character blur-in (soft-blur-in at micro scale) */}
+        <span className="font-body font-medium text-te-text text-sm leading-none">
+          <AnimatedName name={post.author} prefersReduced={prefersReduced} />
+        </span>
+
+        {/* Post number: middle dot + #NNNN linking to canonical post position */}
+        <span className="font-mono text-[0.6rem] text-te-muted/50 leading-none select-none">·</span>
+        <a
+          href={`#${post.num}`}
+          className="font-mono text-[0.6rem] text-te-muted/60 hover:text-te-muted tracking-wide leading-none transition-colors"
+          onClick={e => {
+            const el = document.getElementById(String(post.num))
+            if (el) {
               e.preventDefault()
-              document.getElementById(String(post.reply_to))?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-            }}
-          >
-            &#8627;&nbsp;#{String(post.reply_to).padStart(4, '0')}
-          </a>
-        )}
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            }
+            // else: let browser native hash navigation handle it
+          }}
+        >
+          #{numStr}
+        </a>
+
         <div className="flex items-center gap-3 ml-auto">
           {post.likes > 0 && (
             <span className={`font-mono text-[0.6rem] tracking-wide leading-none ${post.likes >= 20 ? 'text-te-orange' : 'text-te-muted'}`}>
@@ -105,7 +146,19 @@ function ReplyItem({
 
       {/* Content + nested toggle */}
       <div className="pl-8">
-        <PostContent cooked={post.cooked} urlMap={urlMap} />
+        {/* Content: micro-scale-fade (scale 0.98→1 + opacity), 30ms after chars start */}
+        <motion.div
+          initial={prefersReduced ? false : { opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{
+            duration: 0.15,
+            delay: 0.03,
+            ease: [0.32, 0.72, 0, 1],
+          }}
+          style={{ transformOrigin: '0% 50%' }}
+        >
+          <PostContent cooked={post.cooked} urlMap={urlMap} />
+        </motion.div>
 
         {hasChildren && (
           <div className="mt-3">
