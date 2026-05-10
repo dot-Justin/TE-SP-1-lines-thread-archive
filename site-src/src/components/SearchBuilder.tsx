@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, type RefObject } from 'react'
+import { useState, useMemo, useRef, useEffect, type RefObject } from 'react'
 import { X } from '@phosphor-icons/react'
 import type { Post } from '../types'
 import {
@@ -84,6 +84,7 @@ export function SearchBuilder({ query, setQuery, posts, inputRef }: SearchBuilde
   const [authorSearch, setAuthorSearch] = useState('')
   const afterInputRef = useRef<HTMLInputElement>(null)
   const beforeInputRef = useRef<HTMLInputElement>(null)
+  const numInputRef = useRef<HTMLInputElement>(null)
 
   const apply = useApply(query, setQuery, inputRef)
   const parsed = useMemo(() => parseQuery(query), [query])
@@ -107,6 +108,14 @@ export function SearchBuilder({ query, setQuery, posts, inputRef }: SearchBuilde
   const activeMentions = parsed.filters.find(f => f.key === 'mentions')
   const activeAfter = parsed.filters.find(f => f.key === 'after')
   const activeBefore = parsed.filters.find(f => f.key === 'before')
+  const activeNum = parsed.filters.find(f => f.key === 'num')
+
+  // Sync num input when filter changes externally
+  useEffect(() => {
+    if (numInputRef.current) {
+      numInputRef.current.value = activeNum?.value ?? ''
+    }
+  }, [activeNum?.value])
 
   function applyDateFilter(key: 'after' | 'before', value: string) {
     if (!value) return
@@ -115,7 +124,6 @@ export function SearchBuilder({ query, setQuery, posts, inputRef }: SearchBuilde
 
   return (
     <div
-      className="bg-te-black/95 backdrop-blur-md"
       // Prevent mousedown from blurring the main input
       onMouseDown={e => e.preventDefault()}
     >
@@ -171,59 +179,91 @@ export function SearchBuilder({ query, setQuery, posts, inputRef }: SearchBuilde
           </div>
         </div>
 
-        {/* ── after: / before: ── */}
-        <div className="flex flex-wrap gap-x-6 gap-y-2">
-          {/* after */}
+        {/* ── num: (post number) ── */}
+        <div className="flex items-center gap-2">
+          <SectionLabel>#:</SectionLabel>
           <div className="flex items-center gap-2">
-            <SectionLabel>after:</SectionLabel>
-            <div className="flex items-center gap-1.5">
-              {QUICK_AFTER.map(q => (
-                <Chip
-                  key={q.value}
-                  active={hasFilter(query, 'after', q.value)}
-                  onClick={() => {
-                    const next = removeFilter(query, 'after')
-                    apply(hasFilter(query, 'after', q.value) ? next : addFilter(next, 'after', q.value))
-                  }}
-                >
-                  {q.label}
-                </Chip>
-              ))}
-              <input
-                ref={afterInputRef}
-                type="text"
-                placeholder="YYYY-MM"
-                defaultValue={activeAfter?.value ?? ''}
-                onMouseDown={e => e.stopPropagation()} // allow this input to focus
-                className="font-mono text-[0.6rem] bg-te-surface border border-te-border text-te-text px-2 py-0.5 rounded w-[5.5rem] focus:outline-none focus:border-te-orange placeholder:text-te-muted/40"
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    const val = afterInputRef.current?.value.trim()
-                    if (val) applyDateFilter('after', val)
-                  }
-                }}
-              />
-            </div>
-          </div>
-
-          {/* before */}
-          <div className="flex items-center gap-2">
-            <SectionLabel>before:</SectionLabel>
             <input
-              ref={beforeInputRef}
+              ref={numInputRef}
+              type="number"
+              min={1}
+              placeholder="post number"
+              defaultValue={activeNum?.value ?? ''}
+              onMouseDown={e => e.stopPropagation()}
+              className="font-mono text-[0.6rem] bg-te-surface border border-te-border text-te-text px-2 py-0.5 rounded w-[7rem] focus:outline-none focus:border-te-orange placeholder:text-te-muted/40 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  const val = numInputRef.current?.value.trim()
+                  if (val && /^\d+$/.test(val)) {
+                    apply(addFilter(removeFilter(query, 'num'), 'num', val))
+                  } else if (!val) {
+                    apply(removeFilter(query, 'num'))
+                  }
+                }
+              }}
+            />
+            {activeNum && (
+              <button
+                onMouseDown={e => e.preventDefault()}
+                onClick={() => apply(removeFilter(query, 'num'))}
+                className="inline-flex items-center gap-1 font-mono text-[0.6rem] text-te-orange border border-te-orange/30 bg-te-orange/10 px-2 py-0.5 rounded hover:bg-te-orange/20 transition-colors"
+              >
+                #{activeNum.value} <X size={8} />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* ── after: ── */}
+        <div className="flex items-center gap-2">
+          <SectionLabel>after:</SectionLabel>
+          <div className="flex items-center gap-1.5">
+            {QUICK_AFTER.map(q => (
+              <Chip
+                key={q.value}
+                active={hasFilter(query, 'after', q.value)}
+                onClick={() => {
+                  const next = removeFilter(query, 'after')
+                  apply(hasFilter(query, 'after', q.value) ? next : addFilter(next, 'after', q.value))
+                }}
+              >
+                {q.label}
+              </Chip>
+            ))}
+            <input
+              ref={afterInputRef}
               type="text"
               placeholder="YYYY-MM"
-              defaultValue={activeBefore?.value ?? ''}
+              defaultValue={activeAfter?.value ?? ''}
               onMouseDown={e => e.stopPropagation()}
               className="font-mono text-[0.6rem] bg-te-surface border border-te-border text-te-text px-2 py-0.5 rounded w-[5.5rem] focus:outline-none focus:border-te-orange placeholder:text-te-muted/40"
               onKeyDown={e => {
                 if (e.key === 'Enter') {
-                  const val = beforeInputRef.current?.value.trim()
-                  if (val) applyDateFilter('before', val)
+                  const val = afterInputRef.current?.value.trim()
+                  if (val) applyDateFilter('after', val)
                 }
               }}
             />
           </div>
+        </div>
+
+        {/* ── before: ── */}
+        <div className="flex items-center gap-2">
+          <SectionLabel>before:</SectionLabel>
+          <input
+            ref={beforeInputRef}
+            type="text"
+            placeholder="YYYY-MM"
+            defaultValue={activeBefore?.value ?? ''}
+            onMouseDown={e => e.stopPropagation()}
+            className="font-mono text-[0.6rem] bg-te-surface border border-te-border text-te-text px-2 py-0.5 rounded w-[5.5rem] focus:outline-none focus:border-te-orange placeholder:text-te-muted/40"
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                const val = beforeInputRef.current?.value.trim()
+                if (val) applyDateFilter('before', val)
+              }
+            }}
+          />
         </div>
 
         {/* ── from: (author search) ── */}

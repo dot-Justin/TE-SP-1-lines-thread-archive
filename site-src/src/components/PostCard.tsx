@@ -15,14 +15,15 @@ interface PostCardProps {
   replyIndex: Map<number, number[]>
   postMap: Map<number, Post>
   isMatch?: boolean
+  onNavigateToPost?: (postNum: number) => void
 }
 
-export const PostCard = memo(function PostCard({ post, urlMap, avatarMap, replyIndex, postMap, isMatch }: PostCardProps) {
+export const PostCard = memo(function PostCard({ post, urlMap, avatarMap, replyIndex, postMap, isMatch, onNavigateToPost }: PostCardProps) {
   const [repliesOpen, setRepliesOpen] = useState(false)
   const prefersReduced = useReducedMotion()
 
   if (isMilestone(post.num)) {
-    return <MilestoneCard post={post} urlMap={urlMap} avatarMap={avatarMap} replyIndex={replyIndex} postMap={postMap} isMatch={isMatch} />
+    return <MilestoneCard post={post} urlMap={urlMap} avatarMap={avatarMap} replyIndex={replyIndex} postMap={postMap} isMatch={isMatch} onNavigateToPost={onNavigateToPost} />
   }
 
   const numStr = String(post.num).padStart(4, '0')
@@ -99,6 +100,7 @@ export const PostCard = memo(function PostCard({ post, urlMap, avatarMap, replyI
                     replyIndex={replyIndex}
                     urlMap={urlMap}
                     avatarMap={avatarMap}
+                    onNavigateToPost={onNavigateToPost}
                     depth={1}
                   />
                 </motion.div>

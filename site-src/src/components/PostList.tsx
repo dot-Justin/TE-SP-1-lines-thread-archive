@@ -19,9 +19,10 @@ interface PostListProps {
   matchPostNums?: Set<number>
   onVirtualizerReady?: (info: VirtualizerInfo) => void
   onCurrentIndexChange?: (index: number) => void
+  onNavigateToPost?: (postNum: number) => void
 }
 
-export function PostList({ posts, urlMap, avatarMap, replyIndex, postMap, isEmpty, matchPostNums, onVirtualizerReady, onCurrentIndexChange }: PostListProps) {
+export function PostList({ posts, urlMap, avatarMap, replyIndex, postMap, isEmpty, matchPostNums, onVirtualizerReady, onCurrentIndexChange, onNavigateToPost }: PostListProps) {
   const listRef = useRef<HTMLDivElement>(null)
   const [scrollMargin, setScrollMargin] = useState(0)
 
@@ -111,7 +112,7 @@ export function PostList({ posts, urlMap, avatarMap, replyIndex, postMap, isEmpt
                 transform: `translateY(${item.start - virtualizer.options.scrollMargin}px)`,
               }}
             >
-              <PostCard post={post} urlMap={urlMap} avatarMap={avatarMap} replyIndex={replyIndex} postMap={postMap} isMatch={matchPostNums?.has(post.num) ?? false} />
+              <PostCard post={post} urlMap={urlMap} avatarMap={avatarMap} replyIndex={replyIndex} postMap={postMap} isMatch={matchPostNums?.has(post.num) ?? false} onNavigateToPost={onNavigateToPost} />
             </div>
           )
         })}

@@ -162,6 +162,7 @@ export function App() {
           matchPostNums={matchPostNums}
           onVirtualizerReady={handleVirtualizerReady}
           onCurrentIndexChange={handleCurrentIndexChange}
+          onNavigateToPost={handleTickerNavigate}
         />
       </main>
 

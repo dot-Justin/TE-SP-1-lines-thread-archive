@@ -108,6 +108,12 @@ export function useSearch(posts: Post[]) {
             if (!test || !test(p.likes)) return acc
             break
           }
+
+          case 'num': {
+            const n = parseInt(f.value, 10)
+            if (isNaN(n) || p.num !== n) return acc
+            break
+          }
         }
       }
 

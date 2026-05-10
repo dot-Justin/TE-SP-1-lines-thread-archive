@@ -14,9 +14,10 @@ interface MilestoneCardProps {
   replyIndex: Map<number, number[]>
   postMap: Map<number, Post>
   isMatch?: boolean
+  onNavigateToPost?: (postNum: number) => void
 }
 
-export function MilestoneCard({ post, urlMap, avatarMap, replyIndex, postMap, isMatch }: MilestoneCardProps) {
+export function MilestoneCard({ post, urlMap, avatarMap, replyIndex, postMap, isMatch, onNavigateToPost }: MilestoneCardProps) {
   const prefersReduced = useReducedMotion()
   const [repliesOpen, setRepliesOpen] = useState(false)
   const milestone = getMilestone(post.num)
@@ -126,6 +127,7 @@ export function MilestoneCard({ post, urlMap, avatarMap, replyIndex, postMap, is
                       replyIndex={replyIndex}
                       urlMap={urlMap}
                       avatarMap={avatarMap}
+                      onNavigateToPost={onNavigateToPost}
                       depth={1}
                     />
                   </motion.div>

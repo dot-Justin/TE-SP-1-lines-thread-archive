@@ -24,6 +24,7 @@ interface ReplyThreadProps {
   replyIndex: Map<number, number[]>
   urlMap: Record<string, string>
   avatarMap: Record<string, string>
+  onNavigateToPost?: (postNum: number) => void
   depth?: number
 }
 
@@ -88,6 +89,7 @@ function ReplyItem({
   replyIndex,
   urlMap,
   avatarMap,
+  onNavigateToPost,
   depth,
 }: {
   post: Post
@@ -95,6 +97,7 @@ function ReplyItem({
   replyIndex: Map<number, number[]>
   urlMap: Record<string, string>
   avatarMap: Record<string, string>
+  onNavigateToPost?: (postNum: number) => void
   depth: number
 }) {
   const [expanded, setExpanded] = useState(false)
@@ -117,20 +120,12 @@ function ReplyItem({
 
         {/* Post number: middle dot + #NNNN linking to canonical post position */}
         <span className="font-mono text-[0.6rem] text-te-muted/50 leading-none select-none">·</span>
-        <a
-          href={`#${post.num}`}
+        <button
           className="font-mono text-[0.6rem] text-te-muted/60 hover:text-te-muted tracking-wide leading-none transition-colors"
-          onClick={e => {
-            const el = document.getElementById(String(post.num))
-            if (el) {
-              e.preventDefault()
-              el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-            }
-            // else: let browser native hash navigation handle it
-          }}
+          onClick={() => onNavigateToPost?.(post.num)}
         >
           #{numStr}
-        </a>
+        </button>
 
         <div className="flex items-center gap-3 ml-auto">
           {post.likes > 0 && (
@@ -163,17 +158,13 @@ function ReplyItem({
         {hasChildren && (
           <div className="mt-3">
             {atDepthCap ? (
-              <a
-                href={`#${childNums[0]}`}
+              <button
                 className="inline-flex items-center gap-1 font-mono text-[0.6rem] text-te-muted hover:text-te-orange tracking-wide transition-colors"
-                onClick={e => {
-                  e.preventDefault()
-                  document.getElementById(String(childNums[0]))?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-                }}
+                onClick={() => onNavigateToPost?.(childNums[0])}
               >
                 <ArrowSquareOut size={10} />
                 continue thread → #{String(childNums[0]).padStart(4, '0')}
-              </a>
+              </button>
             ) : (
               <button
                 onClick={() => setExpanded(v => !v)}
@@ -211,6 +202,7 @@ function ReplyItem({
                 replyIndex={replyIndex}
                 urlMap={urlMap}
                 avatarMap={avatarMap}
+                onNavigateToPost={onNavigateToPost}
                 depth={depth + 1}
               />
             </motion.div>
@@ -227,6 +219,7 @@ export function ReplyThread({
   replyIndex,
   urlMap,
   avatarMap,
+  onNavigateToPost,
   depth = 1,
 }: ReplyThreadProps) {
   const prefersReduced = useReducedMotion()
@@ -254,6 +247,7 @@ export function ReplyThread({
               replyIndex={replyIndex}
               urlMap={urlMap}
               avatarMap={avatarMap}
+              onNavigateToPost={onNavigateToPost}
               depth={depth}
             />
           </motion.div>

@@ -1,4 +1,4 @@
-export type FilterKey = 'from' | 'has' | 'before' | 'after' | 'likes' | 'mentions'
+export type FilterKey = 'from' | 'has' | 'before' | 'after' | 'likes' | 'mentions' | 'num'
 
 export interface ActiveFilter {
   key: FilterKey
@@ -13,7 +13,7 @@ export interface ParsedQuery {
   directPostNum?: number
 }
 
-const KNOWN_KEYS: FilterKey[] = ['from', 'has', 'before', 'after', 'likes', 'mentions']
+const KNOWN_KEYS: FilterKey[] = ['from', 'has', 'before', 'after', 'likes', 'mentions', 'num']
 // Matches key:value tokens where key is a known filter keyword
 const TOKEN_RE = new RegExp(`\\b(${KNOWN_KEYS.join('|')}):(\\S+)`, 'gi')
 
