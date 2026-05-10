@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="assets/banner.png" alt="TE SP-1 Lines Thread Archive" width="100%" />
+</div>
+
 # TE SP-1 Lines Thread Archive
 
 > permanent archive of the "TE Stem Player" thread on [llllllll.co](https://llllllll.co/t/te-stem-player/66795). 846 posts, 179 participants, April 2024 – May 2026. Thread is closed.
