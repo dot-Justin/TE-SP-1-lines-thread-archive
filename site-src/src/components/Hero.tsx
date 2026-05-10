@@ -1,4 +1,5 @@
 'use client'
+import { motion } from 'framer-motion'
 import { CaretDown } from '@phosphor-icons/react'
 import type { Stats } from '../types'
 
@@ -9,6 +10,23 @@ interface HeroProps {
 function formatNum(n: number) {
   return n.toLocaleString('en-US')
 }
+
+const containerVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.018 } },
+}
+
+const charVariants = {
+  hidden: { opacity: 0, y: 9, filter: 'blur(12px)' },
+  show: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transition: { duration: 0.648, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
+  },
+}
+
+const TITLE = 'SP-1 ARCHIVE'
 
 export function Hero({ stats }: HeroProps) {
   const scrollToThread = () => {
@@ -32,21 +50,52 @@ export function Hero({ stats }: HeroProps) {
       <div className="flex items-start gap-6 px-6 md:px-10 pt-6 pb-8">
         {/* Left: text */}
         <div className="flex-1 min-w-0">
-          <h1
+          <motion.h1
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
             className="font-display font-black text-te-text uppercase leading-none tracking-tighter"
             style={{ fontSize: 'clamp(2.5rem, 9vw, 7.5rem)' }}
           >
-            SP-1 ARCHIVE
-          </h1>
+            {TITLE.split('').map((ch, i) => (
+              <motion.span
+                key={i}
+                variants={charVariants}
+                style={{ display: 'inline-block', whiteSpace: 'pre' }}
+              >
+                {ch}
+              </motion.span>
+            ))}
+          </motion.h1>
 
           <div className="font-mono text-te-orange tracking-widest mt-2 text-sm md:text-base">
             ステムプレーヤー
           </div>
 
-          <p className="font-mono text-te-muted text-xs mt-4 tracking-wide leading-relaxed">
-            llllllll.co thread archive &middot; April 2024 &ndash; May 2026 &middot;{' '}
-            <span className="text-te-orange">thread closed</span>
-            {' '}&middot; community moved to{' '}
+          <p className="font-mono text-te-muted text-xs mt-4 tracking-wide leading-relaxed max-w-xl select-text">
+            The{' '}
+            <a
+              href="https://llllllll.co"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-te-orange hover:underline"
+            >
+              Lines
+            </a>
+            {' '}forum thread about the Teenage Engineering TE-SP-1 Stem Player — a community
+            reverse-engineering effort tracking firmware extraction, bootloader research, and audio
+            hacking from April 2024 through May 2026, when Lines closed the thread.{' '}
+            This{' '}
+            <a
+              href="https://github.com/dot-Justin/TE-SP-1-lines-thread-archive"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-te-orange hover:underline"
+            >
+              archive
+            </a>
+            {' '}preserves all 846 posts in case the original thread ever goes down. Discussion has
+            since moved to{' '}
             <a
               href="https://discord.gg/y4V6VfHYck"
               target="_blank"
@@ -55,6 +104,7 @@ export function Hero({ stats }: HeroProps) {
             >
               Discord
             </a>
+            .
           </p>
 
           {stats && (

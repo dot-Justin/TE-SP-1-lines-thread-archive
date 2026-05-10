@@ -1,6 +1,32 @@
 // Rewrites llllllll.co upload URLs to local asset paths using the url-map
 // Falls back to original URL if no local mapping exists
 
+const EMOJI_MAP: Record<string, string> = {
+  ':+1:t4:': '👍🏾', ':100:': '💯', ':black_heart:': '🖤',
+  ':blush:': '😊', ':clap:t4:': '👏🏾', ':confused:': '😕',
+  ':construction_worker_man:t2:': '👷🏻‍♂️', ':cowboy_hat_face:': '🤠',
+  ':crossed_fingers:': '🤞', ':crossed_fingers:t4:': '🤞🏾',
+  ':cry:': '😢', ':detective:': '🕵️', ':dotted_line_face:': '🫥',
+  ':drooling_face:': '🤤', ':expressionless_face:': '😑',
+  ':face_with_peeking_eye:': '🫣', ':face_with_spiral_eyes:': '😵‍💫',
+  ':floppy_disk:': '💾', ':flushed_face:': '😳', ':folded_hands:t4:': '🙏🏾',
+  ':frowning:': '😦', ':green_heart:': '💚', ':grimacing:': '😬',
+  ':heart:': '❤️', ':heart_eyes:': '😍', ':hot_face:': '🥵',
+  ':joy:': '😂', ':laughing:': '😆', ':low_battery:': '🪫',
+  ':man_facepalming:t2:': '🤦🏻‍♂️', ':man_shrugging:': '🤷‍♂️',
+  ':melting_face:': '🫠', ':next_track_button:': '⏭️',
+  ':ok_hand:t4:': '👌🏾', ':partying_face:': '🥳',
+  ':raising_hands:': '🙌', ':raising_hands:t4:': '🙌🏾',
+  ':rofl:': '🤣', ':roll_eyes:': '🙄', ':sad_but_relieved_face:': '😥',
+  ':saluting_face:': '🫡', ':scream:': '😱', ':skull:': '💀',
+  ':slight_smile:': '🙂', ':smiley:': '😃',
+  ':smiling_face_with_sunglasses:': '😎', ':sob:': '😭',
+  ':stuck_out_tongue:': '😛', ':sweat_smile:': '😅',
+  ':thinking:': '🤔', ':upside_down_face:': '🙃',
+  ':white_check_mark:': '✅', ':wink:': '😉',
+  ':winking_face_with_tongue:': '😜', ':zany_face:': '🤪',
+}
+
 const UPLOAD_RE = /https:\/\/llllllll\.co\/uploads\/(default|short-url)\/[^\s"')>]*/g
 
 export function rewriteCooked(html: string, urlMap: Record<string, string>): string {
@@ -38,6 +64,19 @@ export function cleanDiscourseHtml(html: string): string {
     const frag = document.createDocumentFragment()
     while (a.firstChild) frag.appendChild(a.firstChild)
     a.replaceWith(frag)
+  })
+
+  // Replace Discourse emoji images with Unicode characters
+  doc.querySelectorAll('img.emoji').forEach(img => {
+    const alt = img.getAttribute('alt') ?? ''
+    const emoji = EMOJI_MAP[alt]
+    const span = doc.createElement('span')
+    if (emoji) {
+      span.textContent = emoji
+    } else {
+      span.textContent = alt // fallback: show the :shortcode: text
+    }
+    img.replaceWith(span)
   })
 
   // Remove Discourse lightbox meta divs

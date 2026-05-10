@@ -21,12 +21,22 @@ export function useSearch(posts: Post[]) {
 
   // Compute indices of matching posts
   const matchIndices = useMemo(() => {
-    const q = debouncedQuery.trim().toLowerCase()
+    const q = debouncedQuery.trim()
     if (!q) return []
+
+    // Direct post number jump: #NNN
+    const directMatch = q.match(/^#(\d+)$/)
+    if (directMatch) {
+      const targetNum = Number(directMatch[1])
+      const idx = posts.findIndex(p => p.num === targetNum)
+      return idx === -1 ? [] : [idx]
+    }
+
+    const ql = q.toLowerCase()
     return posts.reduce((acc, p, i) => {
       if (
-        p.author.toLowerCase().includes(q) ||
-        p.cooked.replace(/<[^>]+>/g, ' ').toLowerCase().includes(q)
+        p.author.toLowerCase().includes(ql) ||
+        p.cooked.replace(/<[^>]+>/g, ' ').toLowerCase().includes(ql)
       ) {
         acc.push(i)
       }

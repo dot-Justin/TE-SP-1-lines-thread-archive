@@ -23,6 +23,7 @@ export function ScrollBar({ posts, virtualizerInfo, currentIndex }: ScrollBarPro
   const [visible, setVisible] = useState(false)
   const [fraction, setFraction] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
+  const [hovering, setHovering] = useState(false)
   const trackRef = useRef<HTMLDivElement>(null)
 
   // Show after hero sentinel leaves viewport
@@ -51,7 +52,6 @@ export function ScrollBar({ posts, virtualizerInfo, currentIndex }: ScrollBarPro
     return () => window.removeEventListener('scroll', onScroll)
   }, [virtualizerInfo])
 
-  // Use accurate currentIndex from virtualizer (passed as prop)
   const currentPost = posts[Math.max(0, Math.min(currentIndex, posts.length - 1))]
 
   // Jump on click/drag
@@ -76,12 +76,16 @@ export function ScrollBar({ posts, virtualizerInfo, currentIndex }: ScrollBarPro
     e.preventDefault()
     setIsDragging(true)
     const onMove = (me: MouseEvent) => jumpToFraction(getFractionFromPointer(me.clientY))
-    const onUp = () => { setIsDragging(false); window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp) }
+    const onUp = () => {
+      setIsDragging(false)
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
     window.addEventListener('mousemove', onMove)
     window.addEventListener('mouseup', onUp)
   }, [jumpToFraction, getFractionFromPointer])
 
-  // Milestone ticks — positions as fractions of the posts array
+  // Milestone ticks
   const milestoneTicks = Object.keys(MILESTONES).map(numStr => {
     const num = Number(numStr)
     const idx = posts.findIndex(p => p.num === num)
@@ -94,79 +98,89 @@ export function ScrollBar({ posts, virtualizerInfo, currentIndex }: ScrollBarPro
     }
   }).filter(Boolean) as { fraction: number; label: string; num: number; idx: number }[]
 
-  if (!visible || posts.length === 0) return null
+  if (posts.length === 0) return null
 
   const thumbPct = fraction * 100
 
   return (
-    <div
-      className="hidden md:flex fixed right-3 md:right-5 top-1/2 -translate-y-1/2 z-40 flex-col items-center gap-1.5 select-none"
-      style={{ height: '60vh' }}
-    >
-      {/* Top date */}
-      {posts.length > 0 && (
-        <span className="font-mono text-[0.5rem] text-te-muted tracking-wide whitespace-nowrap">
-          {formatDate(posts[0].date)}
-        </span>
+    <>
+      {/* Mobile: thin reading progress bar on right edge */}
+      {visible && (
+        <div className="md:hidden fixed right-0 top-0 h-full w-[2px] z-40 bg-te-border">
+          <div
+            className="w-full bg-te-orange transition-none"
+            style={{ height: `${fraction * 100}%` }}
+          />
+        </div>
       )}
 
-      {/* Track */}
-      <div
-        ref={trackRef}
-        className="relative flex-1 w-[3px] bg-te-border rounded-full cursor-pointer"
-        onClick={onTrackClick}
-      >
-        {/* Filled portion */}
+      {/* Desktop: styled scrollbar */}
+      {visible && (
         <div
-          className="absolute top-0 left-0 w-full bg-te-orange/30 rounded-full transition-none"
-          style={{ height: `${thumbPct}%` }}
-        />
-
-        {/* Milestone ticks */}
-        {milestoneTicks.map(tick => (
+          className="hidden md:flex fixed right-2 md:right-3 top-1/2 -translate-y-1/2 z-40 flex-col items-center select-none"
+          style={{ height: '60vh' }}
+          onMouseEnter={() => setHovering(true)}
+          onMouseLeave={() => setHovering(false)}
+        >
+          {/* Track */}
           <div
-            key={tick.num}
-            className="absolute left-1/2 -translate-x-1/2 group cursor-pointer"
-            style={{ top: `${tick.fraction * 100}%` }}
-            onClick={(e) => { e.stopPropagation(); virtualizerInfo?.scrollToIndex(tick.idx) }}
+            ref={trackRef}
+            className="relative flex-1 w-[2px] bg-te-border cursor-pointer"
+            onClick={onTrackClick}
           >
-            <div className="w-2 h-[2px] bg-te-orange rounded-full -translate-x-[2px] group-hover:scale-x-150 transition-transform" />
-            {/* Tooltip on hover */}
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
-              <span className="font-mono text-[0.5rem] text-te-orange tracking-wide bg-te-black border border-te-border px-2 py-1 rounded">
-                {tick.label}
-              </span>
+            {/* Filled portion */}
+            <div
+              className="absolute top-0 left-0 w-full bg-te-orange/25 transition-none"
+              style={{ height: `${thumbPct}%` }}
+            />
+
+            {/* Milestone ticks — small orange dots */}
+            {milestoneTicks.map(tick => (
+              <div
+                key={tick.num}
+                className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 group cursor-pointer"
+                style={{ top: `${tick.fraction * 100}%` }}
+                onClick={(e) => { e.stopPropagation(); virtualizerInfo?.scrollToIndex(tick.idx) }}
+              >
+                <div className="w-[5px] h-[5px] rounded-full bg-te-orange/60 group-hover:bg-te-orange transition-colors" />
+                {/* Tooltip on hover */}
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+                  <span className="font-mono text-[0.45rem] text-te-orange tracking-wide bg-te-black border border-te-border px-1.5 py-0.5 rounded">
+                    {tick.label}
+                  </span>
+                </div>
+              </div>
+            ))}
+
+            {/* Thumb — horizontal notch */}
+            <div
+              className={`absolute left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing group`}
+              style={{ top: `${thumbPct}%` }}
+              onMouseDown={onThumbMouseDown}
+              onClick={e => e.stopPropagation()}
+            >
+              {/* Notch bar */}
+              <div
+                className={`w-3 h-[2px] bg-te-orange transition-all ${isDragging ? 'w-4' : ''}`}
+              />
+
+              {/* Floating label — appears on hover or drag */}
+              {(hovering || isDragging) && currentPost && (
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none whitespace-nowrap">
+                  <div className="flex items-baseline gap-1.5 bg-te-black border border-te-border px-2 py-1 rounded">
+                    <span className="font-mono text-[0.5rem] text-te-orange tracking-widest leading-none">
+                      #{currentPost.num}
+                    </span>
+                    <span className="font-mono text-[0.45rem] text-te-muted leading-none">
+                      {formatDate(currentPost.date)}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        ))}
-
-        {/* Thumb */}
-        <div
-          className={`absolute left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing ${isDragging ? 'scale-110' : ''}`}
-          style={{ top: `${thumbPct}%` }}
-          onMouseDown={onThumbMouseDown}
-          onClick={e => e.stopPropagation()}
-        >
-          {/* Pill */}
-          <div className="bg-te-black border border-te-orange/60 rounded px-2 py-1 flex flex-col items-center gap-0.5 hover:border-te-orange transition-colors shadow-sm">
-            <span className="font-mono text-[0.5rem] text-te-orange tracking-widest leading-none">
-              {currentPost ? String(currentPost.num).padStart(4, '0') : '----'}
-            </span>
-            {currentPost && (
-              <span className="font-mono text-[0.45rem] text-te-muted leading-none whitespace-nowrap">
-                {formatDate(currentPost.date)}
-              </span>
-            )}
-          </div>
         </div>
-      </div>
-
-      {/* Bottom date */}
-      {posts.length > 0 && (
-        <span className="font-mono text-[0.5rem] text-te-muted tracking-wide whitespace-nowrap">
-          {formatDate(posts[posts.length - 1].date)}
-        </span>
       )}
-    </div>
+    </>
   )
 }

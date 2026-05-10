@@ -44,9 +44,12 @@ export function ThreadNav({
         <div className="max-w-5xl mx-auto px-4 md:px-8">
           <div className="flex items-center gap-3 py-3">
             {/* Title */}
-            <span className="font-display font-black text-te-text text-xl md:text-2xl tracking-tight uppercase leading-none flex-shrink-0">
-              SP-1
-            </span>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <img src="/sp-01.svg" alt="" aria-hidden className="h-7 w-auto opacity-75" />
+              <span className="font-display font-black text-te-text text-xl md:text-2xl tracking-tight uppercase leading-none">
+                SP-1
+              </span>
+            </div>
 
             {/* Search */}
             <div className="flex-1 relative max-w-xs ml-auto">
@@ -56,10 +59,10 @@ export function ThreadNav({
               />
               <input
                 ref={inputRef}
-                type="search"
+                type="text"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
-                placeholder="search posts..."
+                placeholder="search posts or #204..."
                 className="w-full bg-te-surface border border-te-border text-te-text font-mono text-xs pl-8 pr-8 py-2 rounded focus:outline-none focus:border-te-orange placeholder:text-te-muted transition-colors"
               />
               {query && (

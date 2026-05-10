@@ -18,11 +18,6 @@ body {
   display: none;
 }
 
-/* Hide Discourse emoji images (external, can't mirror) */
-.prose-te img[src*="/images/emoji/"] {
-  display: none;
-}
-
 /* Post content prose styles */
 .prose-te {
   @apply font-body text-te-text/90 text-sm md:text-base leading-relaxed;
