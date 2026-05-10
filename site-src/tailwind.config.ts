@@ -24,15 +24,8 @@ export default {
         mono:    ['"JetBrains Mono"', 'monospace'],
       },
       animation: {
-        marquee: 'marquee 30s linear infinite',
         pulse2:  'pulse 2s cubic-bezier(0.4,0,0.6,1) infinite',
         bounce2: 'bounce 2s infinite',
-      },
-      keyframes: {
-        marquee: {
-          '0%':   { transform: 'translateX(0%)' },
-          '100%': { transform: 'translateX(-50%)' },
-        },
       },
     },
   },

@@ -135,13 +135,6 @@ body {
   @apply font-mono text-[0.65rem] text-te-muted mt-1 tracking-wide;
 }
 
-/* Respect reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .animate-marquee {
-    animation: none;
-  }
-}
-
 /* Loading state */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
