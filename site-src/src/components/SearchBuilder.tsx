@@ -50,8 +50,8 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
       onClick={onClick}
       className={`font-mono text-[0.65rem] tracking-wide px-2.5 py-1 rounded border transition-colors cursor-pointer ${
         active
-          ? 'border-te-orange/50 bg-te-orange/15 text-te-orange'
-          : 'border-te-border text-te-muted hover:border-te-muted/70 hover:text-te-text'
+          ? 'border-te-orange/50 bg-te-orange/15 text-te-orange active:bg-te-orange/25'
+          : 'border-te-border text-te-muted hover:border-te-muted/70 hover:text-te-text active:border-te-orange/50 active:text-te-orange active:bg-te-orange/10'
       }`}
     >
       {children}
@@ -241,7 +241,7 @@ export function SearchBuilder({ query, setQuery, posts, inputRef }: SearchBuilde
   }, [activeNum?.value])
 
   return (
-    <div onMouseDown={e => e.preventDefault()}>
+    <div onMouseDown={e => e.preventDefault()} onPointerDown={e => e.stopPropagation()}>
       <div className="max-w-5xl mx-auto px-4 md:px-8 pt-5 pb-4">
 
         {/* Active filters */}

@@ -60,26 +60,30 @@ export function AuthorTag({ author, date, likes, replyTo, avatarSrc }: AuthorTag
     <div className="flex items-center justify-between gap-3 flex-wrap">
       {/* Left: avatar + author + reply */}
       <div className="flex items-center gap-2.5">
-        <Avatar src={avatarSrc} author={author} />
-
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="font-body font-medium text-te-text text-sm leading-none">
+        <a
+          href={`https://llllllll.co/u/${author}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2.5 group"
+        >
+          <Avatar src={avatarSrc} author={author} />
+          <span className="font-body font-medium text-te-text text-sm leading-none group-hover:text-te-orange transition-colors">
             {author}
           </span>
+        </a>
 
-          {replyTo && (
-            <a
-              href={`#${replyTo}`}
-              className="font-mono text-[0.65rem] text-te-orange hover:underline tracking-wide leading-none"
-              onClick={e => {
-                e.preventDefault()
-                document.getElementById(String(replyTo))?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-              }}
-            >
-              &#8627;&nbsp;#{String(replyTo).padStart(4, '0')}
-            </a>
-          )}
-        </div>
+        {replyTo && (
+          <a
+            href={`#${replyTo}`}
+            className="font-mono text-[0.65rem] text-te-orange hover:underline tracking-wide leading-none"
+            onClick={e => {
+              e.preventDefault()
+              document.getElementById(String(replyTo))?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            }}
+          >
+            &#8627;&nbsp;#{String(replyTo).padStart(4, '0')}
+          </a>
+        )}
       </div>
 
       {/* Right: likes + date */}

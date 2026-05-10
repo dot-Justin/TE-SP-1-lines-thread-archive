@@ -36,7 +36,7 @@ export function StickyNavFooter() {
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-shrink-0 inline-flex items-center gap-1 font-mono text-[0.6rem] tracking-[0.12em] text-te-muted hover:text-te-orange transition-colors uppercase group"
+              className="flex-shrink-0 inline-flex items-center gap-1 font-mono text-[0.6rem] tracking-[0.12em] text-te-muted hover:text-te-orange active:text-te-orange transition-colors uppercase group"
             >
               {label}
               <ArrowSquareOut

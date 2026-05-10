@@ -171,6 +171,7 @@ export function SP1Device() {
       xmlns="http://www.w3.org/2000/svg"
       onPointerMove={onSVGMove}
       onPointerUp={onSVGUp}
+      onTouchStart={e => e.preventDefault()}
       style={{ touchAction: 'none', userSelect: 'none' }}
     >
       {/* ── leftside — rocker slides up/down ─────────────────────────────────── */}

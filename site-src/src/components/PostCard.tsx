@@ -75,7 +75,7 @@ export const PostCard = memo(function PostCard({ post, urlMap, avatarMap, replyI
             <div className="h-px bg-te-border/50 mt-5 mb-3" />
             <button
               onClick={() => setRepliesOpen(v => !v)}
-              className="inline-flex items-center gap-1.5 font-mono text-[0.65rem] text-te-muted hover:text-te-orange tracking-wide transition-colors"
+              className="inline-flex items-center gap-1.5 font-mono text-[0.65rem] text-te-muted hover:text-te-orange active:text-te-orange tracking-wide transition-colors"
             >
               {repliesOpen ? <CaretUp size={11} /> : <CaretDown size={11} />}
               {repliesOpen ? 'hide replies' : directReplies.length === 1 ? '1 reply' : `${directReplies.length} replies`}

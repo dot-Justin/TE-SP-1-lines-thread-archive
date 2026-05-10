@@ -111,12 +111,19 @@ function ReplyItem({
     <div>
       {/* Author row */}
       <div className="flex items-center gap-2 mb-2 flex-wrap">
-        <Avatar src={avatarMap[post.author]} author={post.author} />
+        <a
+          href={`https://llllllll.co/u/${post.author}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 group"
+        >
+          <Avatar src={avatarMap[post.author]} author={post.author} />
 
-        {/* Name: per-character blur-in (soft-blur-in at micro scale) */}
-        <span className="font-body font-medium text-te-text text-sm leading-none">
-          <AnimatedName name={post.author} prefersReduced={prefersReduced} />
-        </span>
+          {/* Name: per-character blur-in (soft-blur-in at micro scale) */}
+          <span className="font-body font-medium text-te-text text-sm leading-none group-hover:text-te-orange transition-colors">
+            <AnimatedName name={post.author} prefersReduced={prefersReduced} />
+          </span>
+        </a>
 
         {/* Post number: middle dot + #NNNN linking to canonical post position */}
         <span className="font-mono text-[0.6rem] text-te-muted/50 leading-none select-none">·</span>

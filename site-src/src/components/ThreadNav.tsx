@@ -68,8 +68,8 @@ export function ThreadNav({
         closeBuilder()
       }
     }
-    document.addEventListener('mousedown', handle)
-    return () => document.removeEventListener('mousedown', handle)
+    document.addEventListener('pointerdown', handle)
+    return () => document.removeEventListener('pointerdown', handle)
   }, [builderOpen])
 
   const hasQuery = query.trim().length > 0
@@ -139,7 +139,7 @@ export function ThreadNav({
               onMouseDown={e => e.preventDefault()}
               onClick={builderOpen ? closeBuilder : openBuilder}
               className={`flex-shrink-0 transition-colors ${
-                builderOpen ? 'text-te-orange' : 'text-te-muted hover:text-te-text'
+                builderOpen ? 'text-te-orange' : 'text-te-muted hover:text-te-text active:text-te-orange'
               }`}
               aria-label="Toggle filter builder"
             >
