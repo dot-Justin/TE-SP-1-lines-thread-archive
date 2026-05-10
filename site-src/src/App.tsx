@@ -10,9 +10,9 @@ import { PostList } from './components/PostList'
 import { ScrollBar } from './components/ScrollBar'
 import { Footer } from './components/Footer'
 import { StickyNavFooter } from './components/StickyNavFooter'
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import type { Stats } from './types'
+import type { Stats, Post } from './types'
 
 interface VirtualizerInfo {
   scrollMargin: number
@@ -51,6 +51,25 @@ export function App() {
   const { posts, loading } = usePosts()
   const urlMap = useUrlMap()
   const avatarMap = useAvatarMap()
+
+  const replyIndex = useMemo(() => {
+    const idx = new Map<number, number[]>()
+    for (const p of posts) {
+      if (p.reply_to !== null) {
+        const arr = idx.get(p.reply_to) ?? []
+        arr.push(p.num)
+        idx.set(p.reply_to, arr)
+      }
+    }
+    return idx
+  }, [posts])
+
+  const postMap = useMemo(() => {
+    const m = new Map<number, Post>()
+    for (const p of posts) m.set(p.num, p)
+    return m
+  }, [posts])
+
   const loadStartRef = useRef(Date.now())
   const [showLoader, setShowLoader] = useState(true)
 
@@ -128,6 +147,8 @@ export function App() {
           posts={posts}
           urlMap={urlMap}
           avatarMap={avatarMap}
+          replyIndex={replyIndex}
+          postMap={postMap}
           isEmpty={false}
           matchPostNums={matchPostNums}
           onVirtualizerReady={handleVirtualizerReady}

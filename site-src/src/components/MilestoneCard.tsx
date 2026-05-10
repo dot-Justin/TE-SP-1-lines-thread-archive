@@ -1,18 +1,24 @@
+import { useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
+import { CaretDown, CaretUp } from '@phosphor-icons/react'
 import { getMilestone } from '../lib/milestones'
 import { AuthorTag } from './AuthorTag'
 import { PostContent } from './PostContent'
+import { ReplyThread } from './ReplyThread'
 import type { Post } from '../types'
 
 interface MilestoneCardProps {
   post: Post
   urlMap: Record<string, string>
   avatarMap: Record<string, string>
+  replyIndex: Map<number, number[]>
+  postMap: Map<number, Post>
   isMatch?: boolean
 }
 
-export function MilestoneCard({ post, urlMap, avatarMap, isMatch }: MilestoneCardProps) {
+export function MilestoneCard({ post, urlMap, avatarMap, replyIndex, postMap, isMatch }: MilestoneCardProps) {
   const prefersReduced = useReducedMotion()
+  const [repliesOpen, setRepliesOpen] = useState(false)
   const milestone = getMilestone(post.num)
   if (!milestone) return null
 
@@ -86,6 +92,34 @@ export function MilestoneCard({ post, urlMap, avatarMap, isMatch }: MilestoneCar
 
         {/* Content */}
         <PostContent cooked={post.cooked} urlMap={urlMap} />
+
+        {/* Reply toggle */}
+        {(() => {
+          const directReplies = replyIndex.get(post.num) ?? []
+          if (directReplies.length === 0) return null
+          return (
+            <>
+              <div className="h-px bg-te-border/50 mt-5 mb-3" />
+              <button
+                onClick={() => setRepliesOpen(v => !v)}
+                className="inline-flex items-center gap-1.5 font-mono text-[0.65rem] text-te-muted hover:text-te-orange tracking-wide transition-colors"
+              >
+                {repliesOpen ? <CaretUp size={11} /> : <CaretDown size={11} />}
+                {repliesOpen ? 'hide replies' : directReplies.length === 1 ? '1 reply' : `${directReplies.length} replies`}
+              </button>
+              {repliesOpen && (
+                <ReplyThread
+                  postNum={post.num}
+                  postMap={postMap}
+                  replyIndex={replyIndex}
+                  urlMap={urlMap}
+                  avatarMap={avatarMap}
+                  depth={1}
+                />
+              )}
+            </>
+          )
+        })()}
       </div>
 
       {/* Bottom border accent */}

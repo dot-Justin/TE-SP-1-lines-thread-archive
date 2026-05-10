@@ -1,7 +1,9 @@
-import { memo } from 'react'
+import { memo, useState } from 'react'
+import { CaretDown, CaretUp } from '@phosphor-icons/react'
 import { AuthorTag } from './AuthorTag'
 import { PostContent } from './PostContent'
 import { MilestoneCard } from './MilestoneCard'
+import { ReplyThread } from './ReplyThread'
 import { isMilestone } from '../lib/milestones'
 import type { Post } from '../types'
 
@@ -9,16 +11,22 @@ interface PostCardProps {
   post: Post
   urlMap: Record<string, string>
   avatarMap: Record<string, string>
+  replyIndex: Map<number, number[]>
+  postMap: Map<number, Post>
   isMatch?: boolean
 }
 
-export const PostCard = memo(function PostCard({ post, urlMap, avatarMap, isMatch }: PostCardProps) {
+export const PostCard = memo(function PostCard({ post, urlMap, avatarMap, replyIndex, postMap, isMatch }: PostCardProps) {
+  const [repliesOpen, setRepliesOpen] = useState(false)
+
   if (isMilestone(post.num)) {
-    return <MilestoneCard post={post} urlMap={urlMap} avatarMap={avatarMap} isMatch={isMatch} />
+    return <MilestoneCard post={post} urlMap={urlMap} avatarMap={avatarMap} replyIndex={replyIndex} postMap={postMap} isMatch={isMatch} />
   }
 
   const numStr = String(post.num).padStart(4, '0')
   const isHighLiked = post.likes >= 20
+  const directReplies = replyIndex.get(post.num) ?? []
+  const hasReplies = directReplies.length > 0
 
   return (
     <article
@@ -30,7 +38,6 @@ export const PostCard = memo(function PostCard({ post, urlMap, avatarMap, isMatc
       <div className="max-w-5xl mx-auto px-4 md:px-8 py-6">
         {/* Post header */}
         <div className="flex items-center justify-between mb-4">
-          {/* Post number — links to original forum post */}
           <a
             href={`https://llllllll.co/t/te-stem-player/66795/${post.num}`}
             target="_blank"
@@ -58,6 +65,31 @@ export const PostCard = memo(function PostCard({ post, urlMap, avatarMap, isMatc
 
         {/* Content */}
         <PostContent cooked={post.cooked} urlMap={urlMap} />
+
+        {/* Reply toggle */}
+        {hasReplies && (
+          <>
+            <div className="h-px bg-te-border/50 mt-5 mb-3" />
+            <button
+              onClick={() => setRepliesOpen(v => !v)}
+              className="inline-flex items-center gap-1.5 font-mono text-[0.65rem] text-te-muted hover:text-te-orange tracking-wide transition-colors"
+            >
+              {repliesOpen ? <CaretUp size={11} /> : <CaretDown size={11} />}
+              {repliesOpen ? 'hide replies' : directReplies.length === 1 ? '1 reply' : `${directReplies.length} replies`}
+            </button>
+
+            {repliesOpen && (
+              <ReplyThread
+                postNum={post.num}
+                postMap={postMap}
+                replyIndex={replyIndex}
+                urlMap={urlMap}
+                avatarMap={avatarMap}
+                depth={1}
+              />
+            )}
+          </>
+        )}
       </div>
     </article>
   )
