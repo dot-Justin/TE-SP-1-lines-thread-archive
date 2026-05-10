@@ -10,6 +10,7 @@ import { ScrollBar } from './components/ScrollBar'
 import { Footer } from './components/Footer'
 import { StickyNavFooter } from './components/StickyNavFooter'
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import type { Stats } from './types'
 
 interface VirtualizerInfo {
@@ -20,7 +21,16 @@ interface VirtualizerInfo {
 
 function LoadingScreen() {
   return (
-    <div className="min-h-[100dvh] bg-te-black flex flex-col items-center justify-center gap-6">
+    <motion.div
+      className="fixed inset-0 z-[9999] bg-te-black flex flex-col items-center justify-center gap-6"
+      initial={{ opacity: 1 }}
+      exit={{
+        opacity: 0,
+        y: -10,
+        filter: 'blur(10px)',
+        transition: { duration: 0.52, ease: [0.64, 0, 0.78, 0] },
+      }}
+    >
       <div
         className="font-display font-black text-te-muted uppercase leading-none tracking-tight"
         style={{ fontSize: 'clamp(4rem, 12vw, 10rem)' }}
@@ -30,13 +40,27 @@ function LoadingScreen() {
       <div className="font-mono text-te-muted text-xs tracking-[0.3em] uppercase">
         fetching 846 posts...
       </div>
-    </div>
+    </motion.div>
   )
 }
+
+const MIN_LOADER_MS = 500
 
 export function App() {
   const { posts, loading } = usePosts()
   const urlMap = useUrlMap()
+  const loadStartRef = useRef(Date.now())
+  const [showLoader, setShowLoader] = useState(true)
+
+  useEffect(() => {
+    if (!loading) {
+      const elapsed = Date.now() - loadStartRef.current
+      const remaining = Math.max(0, MIN_LOADER_MS - elapsed)
+      const timer = setTimeout(() => setShowLoader(false), remaining)
+      return () => clearTimeout(timer)
+    }
+  }, [loading])
+
   const {
     query, setQuery,
     matchIndices, matchPostNums,
@@ -73,10 +97,9 @@ export function App() {
   // Sync URL hash with scroll position
   useHashSync(posts, virtualizerInfo)
 
-  if (loading) return <LoadingScreen />
-
   return (
     <>
+      <AnimatePresence>{showLoader && <LoadingScreen />}</AnimatePresence>
       <Hero stats={stats} />
       <StatsTicker />
 
