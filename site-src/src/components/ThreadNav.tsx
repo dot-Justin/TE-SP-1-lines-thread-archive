@@ -32,6 +32,20 @@ export function ThreadNav({
     return () => observer.disconnect()
   }, [])
 
+  // Intercept Ctrl+F / Cmd+F → focus our search input
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        e.preventDefault()
+        setVisible(true)
+        // Small delay lets the nav finish sliding in before focusing
+        requestAnimationFrame(() => inputRef.current?.focus())
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [setVisible])
+
   const hasQuery = query.trim().length > 0
 
   return (
