@@ -105,6 +105,30 @@ export function cleanDiscourseHtml(html: string): string {
     img.replaceWith(span)
   })
 
+  // Replace iframes (e.g. SoundCloud embeds) with a compact link — iframes get stripped by DOMPurify
+  doc.querySelectorAll('iframe[src]').forEach(iframe => {
+    const src = iframe.getAttribute('src') ?? ''
+    if (!src) { iframe.remove(); return }
+
+    // Try to extract a human-readable domain for the label
+    let label = src
+    try {
+      const u = new URL(src)
+      label = u.hostname.replace(/^w\./, '')
+    } catch { /* keep src as label */ }
+
+    const a = doc.createElement('a')
+    a.href = src
+    a.textContent = `[${label} embed]`
+    a.className = 'onebox-link'
+    a.setAttribute('target', '_blank')
+    a.setAttribute('rel', 'noopener noreferrer')
+
+    const p = doc.createElement('p')
+    p.appendChild(a)
+    iframe.replaceWith(p)
+  })
+
   // Remove Discourse lightbox meta divs
   doc.querySelectorAll('div.meta').forEach(el => el.remove())
 
