@@ -95,6 +95,11 @@ body {
   @apply border-b border-te-border/50 px-3 py-2 text-te-text/80;
 }
 
+/* Onebox link — replaces stripped Discourse link-preview card */
+.prose-te .onebox-link {
+  @apply font-mono text-xs text-te-orange/80 hover:text-te-orange underline underline-offset-2 decoration-te-orange/30 hover:decoration-te-orange break-all;
+}
+
 /* Discourse-specific elements */
 .prose-te .mention {
   @apply text-te-orange/80 font-medium;

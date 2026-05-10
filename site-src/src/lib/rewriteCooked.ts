@@ -61,8 +61,29 @@ export function cleanDiscourseHtml(html: string): string {
   // Use DOMParser to reliably strip onebox embeds — regex fails on nested HTML in browsers
   const doc = new DOMParser().parseFromString(html, 'text/html')
 
-  // Remove onebox embeds (Discourse link-preview cards) — actual <a> links are in surrounding text
-  doc.querySelectorAll('aside.onebox, aside[data-onebox-src]').forEach(el => el.remove())
+  // Replace onebox embeds with a compact inline link (preserves destination)
+  doc.querySelectorAll('aside.onebox, aside[data-onebox-src]').forEach(el => {
+    const url = el.getAttribute('data-onebox-src')
+      ?? el.querySelector('header a')?.getAttribute('href')
+      ?? ''
+    if (!url) { el.remove(); return }
+
+    // Prefer the article h3 title, fall back to the URL itself
+    const titleEl = el.querySelector('article h3 a, article h2 a')
+    const title = titleEl?.textContent?.trim() || url
+
+    const a = doc.createElement('a')
+    a.href = url
+    a.textContent = title
+    a.className = 'onebox-link'
+    a.setAttribute('target', '_blank')
+    a.setAttribute('rel', 'noopener noreferrer')
+
+    // Wrap in a paragraph so it sits on its own line
+    const p = doc.createElement('p')
+    p.appendChild(a)
+    el.replaceWith(p)
+  })
 
   // Remove lightbox wrapper anchors but keep the img inside
   doc.querySelectorAll('a.lightbox').forEach(a => {
