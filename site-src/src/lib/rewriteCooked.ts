@@ -32,7 +32,12 @@ const UPLOAD_RE = /https:\/\/llllllll\.co\/uploads\/(default|short-url)\/[^\s"')
 export function rewriteCooked(html: string, urlMap: Record<string, string>): string {
   if (!html || Object.keys(urlMap).length === 0) return html
 
-  return html.replace(UPLOAD_RE, (match) => {
+  // Normalize relative /uploads/ paths (no domain) → absolute, so URL-map lookup works
+  const normalized = html
+    .replace(/href="\/uploads\//g, 'href="https://llllllll.co/uploads/')
+    .replace(/src="\/uploads\//g, 'src="https://llllllll.co/uploads/')
+
+  return normalized.replace(UPLOAD_RE, (match) => {
     // Try exact match first
     if (urlMap[match]) return urlMap[match]
 
