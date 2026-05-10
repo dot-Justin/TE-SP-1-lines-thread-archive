@@ -8,12 +8,13 @@ import type { Post } from '../types'
 interface PostCardProps {
   post: Post
   urlMap: Record<string, string>
+  avatarMap: Record<string, string>
   isMatch?: boolean
 }
 
-export const PostCard = memo(function PostCard({ post, urlMap, isMatch }: PostCardProps) {
+export const PostCard = memo(function PostCard({ post, urlMap, avatarMap, isMatch }: PostCardProps) {
   if (isMilestone(post.num)) {
-    return <MilestoneCard post={post} urlMap={urlMap} isMatch={isMatch} />
+    return <MilestoneCard post={post} urlMap={urlMap} avatarMap={avatarMap} isMatch={isMatch} />
   }
 
   const numStr = String(post.num).padStart(4, '0')
@@ -49,6 +50,7 @@ export const PostCard = memo(function PostCard({ post, urlMap, isMatch }: PostCa
           date={post.date}
           likes={post.likes}
           replyTo={post.reply_to}
+          avatarSrc={avatarMap[post.author]}
         />
 
         {/* Divider */}

@@ -1,5 +1,6 @@
 import { usePosts } from './hooks/usePosts'
 import { useUrlMap } from './hooks/useUrlMap'
+import { useAvatarMap } from './hooks/useAvatarMap'
 import { useSearch } from './hooks/useSearch'
 import { useHashSync } from './hooks/useCurrentPost'
 import { Hero } from './components/Hero'
@@ -49,6 +50,7 @@ const MIN_LOADER_MS = 500
 export function App() {
   const { posts, loading } = usePosts()
   const urlMap = useUrlMap()
+  const avatarMap = useAvatarMap()
   const loadStartRef = useRef(Date.now())
   const [showLoader, setShowLoader] = useState(true)
 
@@ -125,6 +127,7 @@ export function App() {
         <PostList
           posts={posts}
           urlMap={urlMap}
+          avatarMap={avatarMap}
           isEmpty={false}
           matchPostNums={matchPostNums}
           onVirtualizerReady={handleVirtualizerReady}

@@ -7,10 +7,11 @@ import type { Post } from '../types'
 interface MilestoneCardProps {
   post: Post
   urlMap: Record<string, string>
+  avatarMap: Record<string, string>
   isMatch?: boolean
 }
 
-export function MilestoneCard({ post, urlMap, isMatch }: MilestoneCardProps) {
+export function MilestoneCard({ post, urlMap, avatarMap, isMatch }: MilestoneCardProps) {
   const prefersReduced = useReducedMotion()
   const milestone = getMilestone(post.num)
   if (!milestone) return null
@@ -77,6 +78,7 @@ export function MilestoneCard({ post, urlMap, isMatch }: MilestoneCardProps) {
           date={post.date}
           likes={post.likes}
           replyTo={post.reply_to}
+          avatarSrc={avatarMap[post.author]}
         />
 
         {/* Divider */}

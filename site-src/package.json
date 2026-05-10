@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "start": "npm run build && npx serve dist -l 8080",
-    "prep-assets": "node scripts/prep-assets.mjs"
+    "prep-assets": "node scripts/prep-assets.mjs",
+    "fetch-avatars": "node scripts/fetch-avatars.mjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.7",

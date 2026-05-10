@@ -15,10 +15,13 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const REPO_ROOT = join(__dirname, '..', '..')
 
-const MANIFEST_PATH = join(REPO_ROOT, 'site-src', 'public', 'metadata', 'upload_manifest.json')
-const RAW_UPLOADS  = join(REPO_ROOT, 'raw', 'assets', 'uploads')
-const OUT_UPLOADS  = join(REPO_ROOT, 'site-src', 'public', 'assets', 'uploads')
-const OUT_MAP      = join(REPO_ROOT, 'site-src', 'public', 'assets', 'url-map.json')
+const MANIFEST_PATH  = join(REPO_ROOT, 'site-src', 'public', 'metadata', 'upload_manifest.json')
+const RAW_UPLOADS    = join(REPO_ROOT, 'raw', 'assets', 'uploads')
+const OUT_UPLOADS    = join(REPO_ROOT, 'site-src', 'public', 'assets', 'uploads')
+const OUT_MAP        = join(REPO_ROOT, 'site-src', 'public', 'assets', 'url-map.json')
+const RAW_AVATARS    = join(REPO_ROOT, 'raw', 'assets', 'avatars')
+const OUT_AVATARS    = join(REPO_ROOT, 'site-src', 'public', 'assets', 'avatars')
+const OUT_AVATAR_MAP = join(REPO_ROOT, 'site-src', 'public', 'assets', 'avatar-map.json')
 
 // Magic byte signatures for common image/file types
 function detectExtension(buf) {
@@ -110,6 +113,38 @@ async function main() {
   console.log(`  Missing: ${missing} (not in raw/assets/uploads)`)
   console.log(`  URL map written to: ${OUT_MAP}`)
   console.log(`  Total mappings: ${Object.keys(urlMap).length}`)
+
+  // --- Avatars ---
+  console.log(`\nCopying avatars...`)
+  mkdirSync(OUT_AVATARS, { recursive: true })
+
+  const avatarManifestPath = join(RAW_AVATARS, '_manifest.json')
+  if (!existsSync(avatarManifestPath)) {
+    console.log(`  No avatar manifest found — run fetch-avatars.mjs first.`)
+    return
+  }
+
+  const avatarManifest = JSON.parse(readFileSync(avatarManifestPath, 'utf8'))
+  const avatarMap = {}
+  let avatarCopied = 0
+  let avatarSkipped = 0
+
+  for (const [username, filename] of Object.entries(avatarManifest)) {
+    const src = join(RAW_AVATARS, filename)
+    const dest = join(OUT_AVATARS, filename)
+    if (!existsSync(src)) continue
+    if (!existsSync(dest)) {
+      copyFileSync(src, dest)
+      avatarCopied++
+    } else {
+      avatarSkipped++
+    }
+    avatarMap[username] = `/assets/avatars/${filename}`
+  }
+
+  writeFileSync(OUT_AVATAR_MAP, JSON.stringify(avatarMap, null, 2))
+  console.log(`  Copied: ${avatarCopied}, Skipped: ${avatarSkipped}`)
+  console.log(`  Avatar map written to: ${OUT_AVATAR_MAP}`)
 }
 
 main().catch(err => {
